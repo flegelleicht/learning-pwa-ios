@@ -38,20 +38,6 @@
 			).catch((error) => {
 				console.log(`ServiceWorker registration failed because: ${error}`);
 			})
-		} else if('applicationCache' in window) {
-			var iframe = document.createElement('iframe');
-			iframe.style.display = 'none';
-			iframe.src = 'load-appcache.html';
-			document.body.appendChild(iframe);
-			
-			window.addEventListener('load', () => {
-				window.applicationCache.addEventListener('updateready', () => {
-					if(window.applicationCache.status === window.applicationCache.UPDATEREADY) {
-						window.applicationCache.swapCache();
-						window.location.reload(true);
-					}
-				}, false);
-			}, false);
 		}
 	</script>
 </body>

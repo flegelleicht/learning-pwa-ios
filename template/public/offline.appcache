@@ -1,9 +1,0 @@
-CACHE MANIFEST
-# v4
-CACHE:
-.
-index.html
-NETWORK:
-*
-FALLBACK:
-/ icons/offline.png
