@@ -1,9 +1,9 @@
 CACHE MANIFEST
-# v1
+# v4
 CACHE:
 .
 index.html
 NETWORK:
 *
 FALLBACK:
-/ offline.png
+/ icons/offline.png
