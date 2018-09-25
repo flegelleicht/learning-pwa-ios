@@ -1,6 +1,6 @@
-const VERSION = '0.1.26';
+const VERSION = '0.1.27';
 const CACHE_VERSION = 'v' + VERSION;
-const OFFLINE_URL = 'icons/app-icon.png';
+const OFFLINE_URL = 'icons/offline.png';
 
 
 let cachedUrls = [
