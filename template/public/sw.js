@@ -1,44 +1,53 @@
+const VERSION = '0.1.6';
+const CACHE_VERSION = 'v' + VERSION;
+const OFFLINE_URL = 'icons/app-icon.png';
+
+
 let cachedUrls = [
+  '/',
   'index.html',
-  '.',
+  'scr.js',
+  OFFLINE_URL
 ]
 
-self.addEventListener('install', () => {
-  return self.skipWaiting();
+self.addEventListener('install', (event) => {
+  event.waitUntil(caches.open(CACHE_VERSION)
+    .then(cache => {
+      return cache.addAll(cachedUrls);
+    })
+    .then(() => {
+      return self.skipWaiting();
+    })
+  );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.open('wiederlist')
-      .then((cache) => {
-        return cache.addAll(cachedUrls);
-      })
-      .then(() => {
-        return self.clients.claim();
-      })
-      .catch((error) => {
-        console.log(`Error during cache handling: ${error}`);
-      })
+    caches.keys()
+    .then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (CACHE_VERSION !== cacheName) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request)
-      .then((response) => {
-        if(response) { return response; }
+    .then(response => {
+      if (response) {
+        return response;
+      }
 
-        return fetch(event.request)
-                .then((response) => {
-                  return caches.open('wiederlist')
-                          .then((cache) => {
-                            cache.put(event.request, response.clone());
-                            return response;
-                          });
-                });
-      })
-      .catch((error) => {
-        console.log(`Error fetching resource from cache: ${error.message}`);
-      })
+      return fetch(event.request)
+        .catch(() => {
+          return caches.match(OFFLINE_URL);
+        });
+    })
   );
 });

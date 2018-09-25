@@ -27,8 +27,10 @@
 	<link rel="apple-touch-icon" sizes="167x167" href="icons/touch-icon-ipad-retina.png">
 </head>
 
-<body>
+<body> 
 	<p>Wiederlist!</p>
+	<img style="width:80vw" src="icons/touch-icon-ipad.png">
+	<button id="greet">Greet</button>
 	<script>
 		if('serviceWorker' in navigator) {
 			navigator.serviceWorker.register('sw.js').then(
@@ -39,6 +41,12 @@
 				console.log(`ServiceWorker registration failed because: ${error}`);
 			})
 		}
+	</script>
+	<script src="scr.js"></script>
+	<script>
+		document.getElementById('greet').addEventListener('click', (event) => {
+			greet("World");
+		});
 	</script>
 </body>
 </html>
