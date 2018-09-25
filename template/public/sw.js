@@ -1,0 +1,4 @@
+let cachedUrls = [
+  'index.html',
+  '.',
+]
