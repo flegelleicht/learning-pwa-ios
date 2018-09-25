@@ -1,4 +1,4 @@
-const VERSION = '0.1.6';
+const VERSION = '0.1.26';
 const CACHE_VERSION = 'v' + VERSION;
 const OFFLINE_URL = 'icons/app-icon.png';
 
@@ -11,12 +11,10 @@ let cachedUrls = [
 ]
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(caches.open(CACHE_VERSION)
     .then(cache => {
       return cache.addAll(cachedUrls);
-    })
-    .then(() => {
-      return self.skipWaiting();
     })
   );
 });
@@ -37,6 +35,7 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  console.log(`fetch: ${event.request}`);
   event.respondWith(
     caches.match(event.request)
     .then(response => {

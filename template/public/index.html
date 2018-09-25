@@ -29,8 +29,9 @@
 
 <body> 
 	<p>Wiederlist!</p>
+	<div style="display:none" id="workerupdate">A worker update is available: <button id="workerupdate-btn">Update</button></div>
 	<img style="width:80vw" src="icons/touch-icon-ipad.png">
-	<button id="greet">Greet</button>
+
 	<script>
 		if('serviceWorker' in navigator) {
 			navigator.serviceWorker.register('sw.js').then(
@@ -41,12 +42,6 @@
 				console.log(`ServiceWorker registration failed because: ${error}`);
 			})
 		}
-	</script>
-	<script src="scr.js"></script>
-	<script>
-		document.getElementById('greet').addEventListener('click', (event) => {
-			greet("World");
-		});
 	</script>
 </body>
 </html>
