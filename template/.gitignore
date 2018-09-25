@@ -1,0 +1,4 @@
+/vendor
+/rootca.*
+/server.*
+/v3.ext
