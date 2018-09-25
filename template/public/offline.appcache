@@ -1,0 +1,8 @@
+CACHE MANIFEST
+CACHE:
+.
+index.html
+NETWORK:
+*
+FALLBACK:
+/ offline.png
