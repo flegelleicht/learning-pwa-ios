@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env bundle exec ruby
 #
 # This code snippet shows how to enable SSL in Sinatra.
 # Thank you to: https://gist.github.com/TakahikoKawasaki/40ef0ab011b0a467bedf#file-sinatra-ssl-rb
