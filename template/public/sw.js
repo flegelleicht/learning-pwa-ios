@@ -7,20 +7,12 @@ self.addEventListener('install', () => {
   return self.skipWaiting();
 });
 
-self.addEventListener('activate', () => {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.open('wiederlist')
       .then((cache) => {
         return cache.addAll(cachedUrls);
       })
-  )
-  .then(() => {
-    return self.clients.claim();
-  })
-  .catch((error) => {
-    console.log(`Error during cache handling: ${error}`);
-  })
-})
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
