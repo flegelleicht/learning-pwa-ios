@@ -13,6 +13,15 @@ self.addEventListener('activate', (event) => {
       .then((cache) => {
         return cache.addAll(cachedUrls);
       })
+      .then(() => {
+        return self.clients.claim();
+      })
+      .catch((error) => {
+        console.log(`Error during cache handling: ${error}`);
+      })
+  );
+});
+
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
