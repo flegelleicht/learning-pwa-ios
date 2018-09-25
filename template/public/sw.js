@@ -1,4 +1,4 @@
-const VERSION = '0.1.27';
+const VERSION = '0.1.28';
 const CACHE_VERSION = 'v' + VERSION;
 const OFFLINE_URL = 'icons/offline.png';
 
@@ -35,7 +35,7 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  console.log(`fetch: ${event.request}`);
+  console.log(`fetch: ${event.request.url}`);
   event.respondWith(
     caches.match(event.request)
     .then(response => {
