@@ -48,6 +48,15 @@ window.addEventListener('load', () => {
         });
       });
       
+      /* Make list current list by clicking on it */
+      Array.from(document.getElementsByClassName('list')).map((el) => {
+        el.addEventListener('click', (event) => {
+          let list = lists.find((l) => { return l.id === event.target.id });
+          currentListId = list.id;
+          storage.setItem('currentListId', currentListId);
+          render();
+        });
+      });
     };
     
     render();
