@@ -27,7 +27,7 @@ window.addEventListener('load', () => {
         let l = lists.find((l) => { return l.id === currentListId; });
         let currentListHeader = `${l.title}`;
         document.getElementById('list-header').innerHTML = currentListHeader;
-        let currentListItems = l.items.reduce((acc, item) => { return acc + `<li class="listitem" id="${item.id}">${item.title}</li>`; }, "");
+        let currentListItems = l.items.reduce((acc, item) => { return acc + `<li class="listitem ${item.done ? 'done' : ''}" id="${item.id}">${item.title}</li>`; }, "");
         document.getElementById('list-items').innerHTML = currentListItems;
       }
       
@@ -56,6 +56,18 @@ window.addEventListener('load', () => {
           storage.setItem('currentListId', currentListId);
           render();
         });
+      });
+      
+      /* Mark item as done by clicking on it */
+      Array.from(document.getElementsByClassName('listitem')).map((el) => {
+        el.addEventListener('click', (event) => {
+          let list = lists.find((l) => { return l.id === currentListId });
+          let item = list.items.find((item) => { return item.id === event.target.id });
+          item.done = true;
+          
+          storage.setItem('lists', JSON.stringify(lists));
+          render();          
+        })
       });
     };
     
