@@ -53,10 +53,10 @@ const TEMPLATES = [
       { id: "ti_47",   title: "Lappen" },      
       { id: "ti_48",   title: "Duschgel" },      
       { id: "ti_49",   title: "Shampoo" },      
-      { id: "ti_50",   title: "Body Lotions" },      
+      { id: "ti_50",   title: "Body Lotion" },      
       { id: "ti_51",   title: "Deo" },      
       { id: "ti_52",   title: "Zahnpasta" },      
-      { id: "ti_53",   title: "Wattstäbchen" },      
+      { id: "ti_53",   title: "Wattestäbchen" },      
       { id: "ti_54",   title: "Mülltüten" },      
       /* Vorrat */
       { id: "ti_56",   title: "Knoblauch" },      
