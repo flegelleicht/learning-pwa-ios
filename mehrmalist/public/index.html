@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />    
+	<meta charset="utf-8">
+	<meta name="author" content="Erik Hebisch">
+	<meta name="viewport" content="width=device-width, height=device-height, maximum-scale=1, minimum-scale=1, user-scalable=no">
+	
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<link href="icons/apple_splash_2048.png" sizes="2048x2732" rel="apple-touch-startup-image" />
+	<link href="icons/apple_splash_1668.png" sizes="1668x2224" rel="apple-touch-startup-image" />
+	<link href="icons/apple_splash_1536.png" sizes="1536x2048" rel="apple-touch-startup-image" />
+	<link href="icons/apple_splash_1125.png" sizes="1125x2436" rel="apple-touch-startup-image" />
+	<link href="icons/apple_splash_1242.png" sizes="1242x2208" rel="apple-touch-startup-image" />
+	<link href="icons/apple_splash_750.png" sizes="750x1334" rel="apple-touch-startup-image" />
+	<link href="icons/apple_splash_640.png" sizes="640x1136" rel="apple-touch-startup-image" />
+	
+	<link rel="apple-touch-icon" href="touch-icon-iphone.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="icons/touch-icon-ipad.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="icons/touch-icon-iphone-retina.png">
+	<link rel="apple-touch-icon" sizes="167x167" href="icons/touch-icon-ipad-retina.png">
+
+  <base href="/">
+
+  <title>Mehrmalist</title>
+</head>
+
+<body> 
+	<h1>Templates</h1>
+	<ul id="template-list"></ul>
+	<h1>Lists</h1>
+	<ul id="list-list"></ul>
+	<h1 id="list-header"></h1>
+	<ul id="list-items"></ul>
+	
+	<script>
+		if('serviceWorker' in navigator) {
+			navigator.serviceWorker.register('sw.js').then(
+				(registration) => {
+					console.log(`Service worker registration was successful. Scope: ${registration.scope}`)
+					window.setInterval(() => {
+						registration.update();
+					}, 1000*60*10 /* 10 minutes */);
+				}
+			).catch((error) => {
+				console.log(`ServiceWorker registration failed because: ${error}`);
+			})
+		}
+	</script>
+	<script type="text/javascript"	src="/mehrmalist/templates.js"></script>
+	<script type="text/javascript" src="/mehrmalist/app.js"></script>
+</body>
+</html>
