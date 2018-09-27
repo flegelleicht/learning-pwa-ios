@@ -5,7 +5,8 @@ let cachedUrls = [
   '/',
   'index.html',
   'app.js',
-  'templates.js'
+  'templates.js',
+  'manifest.json'
 ]
 
 self.addEventListener('install', (event) => {

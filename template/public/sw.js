@@ -7,6 +7,7 @@ let cachedUrls = [
   '/',
   'index.html',
   'scr.js',
+  'manifest.json',
   OFFLINE_URL
 ]
 
