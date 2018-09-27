@@ -1,0 +1,33 @@
+{
+  "short_name": "template",
+  "name": "PWA TEMPLATE",
+  "description" : "A TEMPLATE FOR PWAs",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "index.html",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "img/icon-48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-114.png",
+      "sizes": "114x114",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon-558.png",
+      "sizes": "558x558",
+      "type": "image/png"
+    }
+  ]
+}
