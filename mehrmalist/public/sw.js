@@ -1,14 +1,11 @@
 const VERSION = '0.1.1';
 const CACHE_VERSION = 'v' + VERSION;
-const OFFLINE_URL = 'icons/offline.png';
-
 
 let cachedUrls = [
   '/',
   'index.html',
   'app.js',
-  'templates.js',
-  OFFLINE_URL
+  'templates.js'
 ]
 
 self.addEventListener('install', (event) => {
@@ -42,12 +39,9 @@ self.addEventListener("fetch", (event) => {
     .then(response => {
       if (response) {
         return response;
+      } else {
+        return fetch(event.request)
       }
-
-      return fetch(event.request)
-        .catch(() => {
-          return caches.match(OFFLINE_URL);
-        });
     })
   );
 });
