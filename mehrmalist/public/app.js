@@ -15,7 +15,16 @@ window.addEventListener('load', () => {
         
     const render = () => {
       /* Show Templates */
-      let templateContent = TEMPLATES.reduce((acc, t) => { return acc + `<li class="template" id="${t.id}">${t.title}</li>`; }, "");
+      let templateContent = TEMPLATES.reduce((acc, t) => { 
+        let html = `<li class="template" id="${t.id}">
+                        ${t.title} 
+
+                        <a href='#' class="new-list-from-this" data-templateid="${t.id}">❏</a>
+
+                        ${t.expanded ? `<ul>${t.items.reduce((acc, item) => {return acc + `<li>${item.title}</li>`}, '')}</ul>` : ''} 
+                    </li>`;
+                    return acc + html; 
+      }, "");
       document.getElementById('template-list').innerHTML = templateContent;
     
       /* Show Lists */
@@ -31,10 +40,24 @@ window.addEventListener('load', () => {
         document.getElementById('list-items').innerHTML = currentListItems;
       }
       
-      /* Make list from template by clicking on it */
+      /* Toggle template list expansion by clicking on it */
       Array.from(document.getElementsByClassName('template')).map((el) => {
         el.addEventListener('click', (event) => {
-          let template = TEMPLATES.find((t) => { return t.id === event.target.id; } );
+          let template = TEMPLATES.find((t) => { return t.id === event.target.id; });
+          if (template.expanded === true) {
+            template.expanded = false;
+          } else {
+            template.expanded = true;
+          }
+          render();
+        });
+      });  
+      
+      /* Make list from template by clicking on it */
+      Array.from(document.getElementsByClassName('new-list-from-this')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
           let newList = {};
           newList.id = `l_${lists.length + 1}`;
           newList.title = template.title;
