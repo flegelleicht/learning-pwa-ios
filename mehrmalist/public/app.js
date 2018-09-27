@@ -14,6 +14,10 @@ window.addEventListener('load', () => {
     }
         
     const render = () => {
+      /* Show templates header */
+      const templateHeaderContent = `<h1>Templates <a href="#" id="make-new-template">⊕</a></h1>`;
+      document.getElementById('template-header').innerHTML = templateHeaderContent;
+      
       /* Show Templates */
       let templateContent = TEMPLATES.reduce((acc, t) => { 
         let html = `<li class="template" id="${t.id}">
@@ -39,7 +43,7 @@ window.addEventListener('load', () => {
         let currentListItems = l.items.reduce((acc, item) => { return acc + `<li class="listitem ${item.done ? 'done' : ''}" id="${item.id}">${item.title}</li>`; }, "");
         document.getElementById('list-items').innerHTML = currentListItems;
       }
-      
+            
       /* Toggle template list expansion by clicking on it */
       Array.from(document.getElementsByClassName('template')).map((el) => {
         el.addEventListener('click', (event) => {
@@ -52,6 +56,14 @@ window.addEventListener('load', () => {
           render();
         });
       });  
+      
+      /* Add a new template to templates */
+      document.getElementById('make-new-template').addEventListener('click', (event) => {
+        event.preventDefault();
+        let t = { id: `t_${TEMPLATES.length + 1}`, title: Math.random().toString(36).substr(2,5), items: [], expanded: false };
+        TEMPLATES.push(t);
+        render();
+      });
       
       /* Make list from template by clicking on it */
       Array.from(document.getElementsByClassName('new-list-from-this')).map((el) => {
