@@ -15,15 +15,23 @@ window.addEventListener('load', () => {
         
     const render = () => {
       /* Show templates header */
-      const templateHeaderContent = `<h1>Templates <a href="#" id="make-new-template">⊕</a></h1>`;
+      const templateHeaderContent = `
+      <h1>Templates 
+        <a href="#" id="make-new-template">⊕</a>
+      </h1>`;
       document.getElementById('template-header').innerHTML = templateHeaderContent;
       
       /* Show Templates */
       let templateContent = TEMPLATES.reduce((acc, t) => { 
-        let html = `<li class="template" id="${t.id}">
-                        ${t.title} 
+        let html = `<li>
+                        ${t.editing ? `<input type="text" value="${t.title}" id="input-template-title" data-templateid=${t.id}>` :
+                        `<span class="template" id="${t.id}">${t.title}</span>`}
 
-                        <a href='#' class="new-list-from-this" data-templateid="${t.id}">❏</a>
+                        ${t.editing ? '' : `<a href='#' id="edit-template-title" data-templateid="${t.id}">✍︎</a>` }
+                        
+                        ${t.editing ? `<a href='#' id="commit-template-title" data-templateid="${t.id}">✓</a> <a href='#' id="cancel-template-title" data-templateid="${t.id}">𐄂</a>` : '' }
+
+                        <a href='#' class="make-new-list-from-this" data-templateid="${t.id}">❏</a>
 
                         ${t.expanded ? `<ul>${t.items.reduce((acc, item) => {return acc + `<li>${item.title}</li>`}, '')}</ul>` : ''} 
                     </li>`;
@@ -58,15 +66,42 @@ window.addEventListener('load', () => {
       });  
       
       /* Add a new template to templates */
-      document.getElementById('make-new-template').addEventListener('click', (event) => {
-        event.preventDefault();
-        let t = { id: `t_${TEMPLATES.length + 1}`, title: Math.random().toString(36).substr(2,5), items: [], expanded: false };
-        TEMPLATES.push(t);
-        render();
-      });
+      let makeNewTemplate = document.getElementById('make-new-template');
+      if (makeNewTemplate) {
+        makeNewTemplate.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let t = { id: `t_${TEMPLATES.length + 1}`, title: Math.random().toString(36).substr(2,5), items: [], expanded: false };
+          TEMPLATES.push(t);
+          render();
+        });
+      }
+      
+      /* Enable template title editing */
+      let editTemplateTitle = document.getElementById('edit-template-title');
+      if (editTemplateTitle) {
+        editTemplateTitle.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
+          template.editing = true;
+          render();
+        });
+      }
+
+      /* Commit template title*/
+      let commitTemplateTitle = document.getElementById('commit-template-title');
+      if (commitTemplateTitle) {
+        commitTemplateTitle.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
+          template.title = document.getElementById('input-template-title').value;
+          template.editing = false;
+          render();
+        });
+      }
+
       
       /* Make list from template by clicking on it */
-      Array.from(document.getElementsByClassName('new-list-from-this')).map((el) => {
+      Array.from(document.getElementsByClassName('make-new-list-from-this')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
           let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
