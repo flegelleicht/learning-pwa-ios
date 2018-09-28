@@ -31,7 +31,7 @@ Uses `localStorage` to save your lists and items.
 - [x] Add a new template
 - [x] Change a template
 - [x] Add an item to a template
-- [ ] Save templates to `localStorage`
+- [x] Save templates to `localStorage`
 - [x] Create a list from a template
 - [ ] Add a list without template
 - [ ] Change a list
