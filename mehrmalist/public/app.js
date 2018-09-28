@@ -186,7 +186,8 @@ window.addEventListener('load', () => {
           
           let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
           
-          let item = { id: `ti_${template.items.length + 1}`, title: Math.random().toString(36).substr(2,5) };
+          let item = { id: `ti_${template.items.length + 1}`, title: 'Neuer Template-Eintrag', editing: true };
+          FOCUSSEDINPUTFIELDID = `input-template-item-title-${template.id}-${item.id}`;
           template.items.push(item);
           
           render();
@@ -245,8 +246,9 @@ window.addEventListener('load', () => {
               if (event.shiftKey) {
                 console.log("SHIFT!");
                 document.getElementsByClassName('add-item-to-template')[0].click();
+              } else {
+                render();                
               }
-              render();
               break;
             case 27 /* Escape */: 
               event.preventDefault(); event.stopPropagation();
