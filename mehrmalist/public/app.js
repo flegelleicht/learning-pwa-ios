@@ -23,9 +23,6 @@ window.addEventListener('load', () => {
       
       /* Show Templates */
       let templateContent = TEMPLATES.reduce((acc, t) => { 
-        
-        /* MAKE EDITING LINKS HAVE CLASSES INSTEAD OF IDs! */
-        
         let html = `<li>
                         ${t.editing ? `<input type="text" value="${t.title}" class="input-template-title" id="input-template-title-${t.id}" data-templateid=${t.id}>` :
                         `<span class="template" id="${t.id}">${t.title}</span>`}
