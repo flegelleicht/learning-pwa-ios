@@ -1,4 +1,4 @@
-const DEFAULT_TEMPLATES = [
+const TEMPLATES = [
   {
     id: "t_1",
     title: "Einkauf",
