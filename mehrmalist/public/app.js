@@ -57,7 +57,6 @@ window.addEventListener('load', () => {
             :
             `<span class="listitem" id="${item.id}">${item.title}</span> <a href='#' class="edit-item-title" data-itemid=${item.id} data-listid="${list.id}">✍︎</a>`
           }
-          
         </li>`;
       };
       
@@ -68,7 +67,8 @@ window.addEventListener('load', () => {
         document.getElementById('list-header').innerHTML = currentListHeader;
         let currentListItems = l.items.reduce((acc, item) => { 
           return acc + formatItemForList(item, l); }, "");
-        document.getElementById('list-items').innerHTML = currentListItems;
+        let allListItems = currentListItems + `<li><a href='#' class="add-item-to-list" data-listid="${l.id}">⊕</a></li>`;
+        document.getElementById('list-items').innerHTML = allListItems;
       }
             
       /* Toggle template list expansion by clicking on it */
@@ -167,6 +167,20 @@ window.addEventListener('load', () => {
           render();
         });
       });
+      
+      /* Add an item to a list */
+      Array.from(document.getElementsByClassName('add-item-to-list')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let list = lists.find((l) => { return l.id === event.target.dataset.listid });          
+          let item = { id: `li_${list.items.length + 1}`, title: "Neuer Eintrag", editing: true };
+          list.items.push(item);
+          
+          storage.setItem('lists', JSON.stringify(lists));
+          render();
+        });
+      });
+      
       
       /* Mark item as done by clicking on it */
       Array.from(document.getElementsByClassName('listitem')).map((el) => {
