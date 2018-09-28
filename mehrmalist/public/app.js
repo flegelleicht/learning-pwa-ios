@@ -242,6 +242,10 @@ window.addEventListener('load', () => {
                 item.editing = false;
                 storage.setItem('state', JSON.stringify(state));
               }
+              if (event.shiftKey) {
+                console.log("SHIFT!");
+                document.getElementsByClassName('add-item-to-template')[0].click();
+              }
               render();
               break;
             case 27 /* Escape */: 
