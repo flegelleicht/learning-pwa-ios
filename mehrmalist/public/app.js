@@ -106,6 +106,7 @@ window.addEventListener('load', () => {
           } else {
             template.expanded = true;
           }
+          storage.setItem('state', JSON.stringify(state));
           render();
         });
       });  
