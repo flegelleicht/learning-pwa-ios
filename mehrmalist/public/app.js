@@ -116,15 +116,25 @@ window.addEventListener('load', () => {
         });
       });
       
-      /* Commit template title with enter */
+      /* Commit/cancel template title with enter/escape */
       Array.from(document.getElementsByClassName('input-template-title')).map((el) => {
         el.addEventListener('keyup', (event) => {
           switch (event.keyCode) {
             case 13 /* Enter */: 
               event.preventDefault(); event.stopPropagation();
-              let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
-              template.title = document.getElementById(`input-template-title-${template.id}`).value;
-              template.editing = false;
+              { 
+                let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
+                template.title = document.getElementById(`input-template-title-${template.id}`).value;
+                template.editing = false;
+              }
+              render();
+              break;
+            case 27 /* Escape */: 
+              event.preventDefault(); event.stopPropagation();
+              {
+                let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
+                template.editing = false;
+              }
               render();
               break;
             default: break;
