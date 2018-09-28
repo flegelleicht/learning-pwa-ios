@@ -23,13 +23,16 @@ window.addEventListener('load', () => {
       
       /* Show Templates */
       let templateContent = TEMPLATES.reduce((acc, t) => { 
+        
+        /* MAKE EDITING LINKS HAVE CLASSES INSTEAD OF IDs! */
+        
         let html = `<li>
-                        ${t.editing ? `<input type="text" value="${t.title}" id="input-template-title" data-templateid=${t.id}>` :
+                        ${t.editing ? `<input type="text" value="${t.title}" class="input-template-title" id="input-template-title-${t.id}" data-templateid=${t.id}>` :
                         `<span class="template" id="${t.id}">${t.title}</span>`}
 
-                        ${t.editing ? '' : `<a href='#' id="edit-template-title" data-templateid="${t.id}">✍︎</a>` }
+                        ${t.editing ? '' : `<a href='#' class="edit-template-title" data-templateid="${t.id}">✍︎</a>` }
                         
-                        ${t.editing ? `<a href='#' id="commit-template-title" data-templateid="${t.id}">✓</a> <a href='#' id="cancel-template-title" data-templateid="${t.id}">𐄂</a>` : '' }
+                        ${t.editing ? `<a href='#' class="commit-template-title" data-templateid="${t.id}">✓</a> <a href='#' class="cancel-template-title" data-templateid="${t.id}">𐄂</a>` : '' }
 
                         <a href='#' class="make-new-list-from-this" data-templateid="${t.id}">❏</a>
 
@@ -77,28 +80,35 @@ window.addEventListener('load', () => {
       }
       
       /* Enable template title editing */
-      let editTemplateTitle = document.getElementById('edit-template-title');
-      if (editTemplateTitle) {
-        editTemplateTitle.addEventListener('click', (event) => {
+      Array.from(document.getElementsByClassName('edit-template-title')).map((el) => {
+        el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
           let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
           template.editing = true;
           render();
         });
-      }
+      });
 
       /* Commit template title*/
-      let commitTemplateTitle = document.getElementById('commit-template-title');
-      if (commitTemplateTitle) {
-        commitTemplateTitle.addEventListener('click', (event) => {
+      Array.from(document.getElementsByClassName('commit-template-title')).map((el) => {
+        el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
           let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
-          template.title = document.getElementById('input-template-title').value;
+          template.title = document.getElementById(`input-template-title-${template.id}`).value;
           template.editing = false;
           render();
         });
-      }
+      });
 
+      /* Cancel editing template title*/
+      Array.from(document.getElementsByClassName('cancel-template-title')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
+          template.editing = false;
+          render();
+        });
+      });
       
       /* Make list from template by clicking on it */
       Array.from(document.getElementsByClassName('make-new-list-from-this')).map((el) => {
