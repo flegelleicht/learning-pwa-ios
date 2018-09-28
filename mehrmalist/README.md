@@ -40,6 +40,8 @@ Uses `localStorage` to save your lists and items.
 - [x] Add an item to a list
 - [x] Change an item in a list
 - [x] Mark an item as done
+- [ ] Commit editing on enter (⏎)
+- [ ] Cancel editing on esc (⎋)
 - [ ] Add result to an item after completing (ah, and don't hide what you have done)
 - [ ] Sync state with a backend
 
