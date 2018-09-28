@@ -36,7 +36,10 @@ window.addEventListener('load', () => {
 
                         <a href='#' class="make-new-list-from-this" data-templateid="${t.id}">❏</a>
 
-                        ${t.expanded ? `<ul>${t.items.reduce((acc, item) => {return acc + `<li>${item.title}</li>`}, '')}</ul>` : ''} 
+                        ${t.expanded ? `<ul>
+                          ${t.items.reduce((acc, item) => {return acc + `<li>${item.title}</li>`}, '')}
+                          <li><a href='#' class="add-item-to-template" data-templateid="${t.id}">⊕</a></li>
+                          </ul>` : ''} 
                     </li>`;
                     return acc + html; 
       }, "");
@@ -106,6 +109,20 @@ window.addEventListener('load', () => {
           event.preventDefault(); event.stopPropagation();
           let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
           template.editing = false;
+          render();
+        });
+      });
+      
+      /* Add an item to a template */
+      Array.from(document.getElementsByClassName('add-item-to-template')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          
+          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
+          
+          let item = { id: `ti_${template.items.length + 1}`, title: Math.random().toString(36).substr(2,5) };
+          template.items.push(item);
+          
           render();
         });
       });
