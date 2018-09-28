@@ -77,7 +77,7 @@ window.addEventListener('load', () => {
         <li class="${item.done ? 'done' : ''} ${item.editing ? 'editing' : ''}" 
             id="${item.id}">
           ${item.editing ? 
-            `<input type="text" value="${item.title}" class="input-item-title" id="input-item-title-${list.id}-${item.id}" data-listid="${list.id}" data-itemid="${item.id}">
+            `<input type="text" value="${item.title}" class="input-item-title" id="input-item-title-${list.id}-${item.id}" data-listid="${list.id}" data-itemid="${item.id}" ${FOCUSSEDINPUTFIELDID === `input-item-title-${list.id}-${item.id}` ? 'autofocus' : ''}>
               <a href='#' class="commit-item-title" data-listid="${list.id}" data-itemid="${item.id}">✓</a>
               <a href='#' class="cancel-item-title" data-listid="${list.id}" data-itemid="${item.id}">𐄂</a>` 
             :
@@ -200,6 +200,7 @@ window.addEventListener('load', () => {
           let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid });
           let item = template.items.find((i) => { return i.id === event.target.dataset.itemid });
           item.editing = true;
+          FOCUSSEDINPUTFIELDID = `input-template-item-title-${template.id}-${item.id}`;
           render();
         });
       });
@@ -318,6 +319,7 @@ window.addEventListener('load', () => {
           let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
           let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
           item.editing = true;
+          FOCUSSEDINPUTFIELDID = `input-item-title-${list.id}-${item.id}`;
           render();
         });
       });
