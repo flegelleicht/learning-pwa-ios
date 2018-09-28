@@ -39,8 +39,8 @@ window.addEventListener('load', () => {
             id="${item.id}">
           ${item.editing ? 
             `<input type="text" value="${item.title}" class="input-template-item-title" id="input-template-item-title-${template.id}-${item.id}" data-templateid=${template.id} data-itemid="${item.id}">
-              <a href='#' class="commit-template-item-title" data-listid="${template.id}" data-itemid="${item.id}">✓</a>
-              <a href='#' class="cancel-template-item-title" data-listid="${template.id}" data-itemid="${item.id}">𐄂</a>` 
+              <a href='#' class="commit-template-item-title" data-templateid="${template.id}" data-itemid="${item.id}">✓</a>
+              <a href='#' class="cancel-template-item-title" data-templateid="${template.id}" data-itemid="${item.id}">𐄂</a>` 
             :
             `<span class="templateitem" id="${item.id}">${item.title}</span> <a href='#' class="edit-template-item-title" data-templateid=${template.id} data-itemid="${item.id}">✍︎</a>`
           }
@@ -209,7 +209,7 @@ window.addEventListener('load', () => {
           event.preventDefault(); event.stopPropagation();
           let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid });
           let item = template.items.find((i) => { return i.id === event.target.dataset.itemid });
-          item.title = document.getElementById(`input-item-title-${template.id}-${item.id}`).value;
+          item.title = document.getElementById(`input-template-item-title-${template.id}-${item.id}`).value;
           item.editing = false;
           storage.setItem('state', JSON.stringify(state));
           render();          
