@@ -37,7 +37,7 @@ Uses `localStorage` to save your lists and items.
 - [ ] Change a list
 - [ ] Create a template from a list
 - [x] Select a list
-- [ ] Add an item
+- [ ] Add an item to a list
 - [x] Change an item in a list
 - [x] Mark an item as done
 - [ ] Add result to an item after completing (ah, and don't hide what you have done)
