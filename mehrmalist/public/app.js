@@ -255,6 +255,34 @@ window.addEventListener('load', () => {
         });
       });
       
+      /* Commit/cancel item title with enter/escape */
+      Array.from(document.getElementsByClassName('input-item-title')).map((el) => {
+        el.addEventListener('keyup', (event) => {
+          switch (event.keyCode) {
+            case 13 /* Enter */: 
+              event.preventDefault(); event.stopPropagation();
+              { 
+                let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+                let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
+                item.title = document.getElementById(`input-item-title-${list.id}-${item.id}`).value;
+                item.editing = false;
+                storage.setItem('lists', JSON.stringify(lists));
+              }
+              render();
+              break;
+            case 27 /* Escape */: 
+              event.preventDefault(); event.stopPropagation();
+              {
+                let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+                let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
+                item.editing = false;
+              }
+              render();
+              break;
+            default: break;
+          }
+        });
+      });
       
     };
     
