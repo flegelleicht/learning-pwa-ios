@@ -29,14 +29,16 @@ Uses `localStorage` to save your lists and items.
 - [x] Display available templates
 - [x] Show template details
 - [x] Add a new template
-- [ ] Change a template
+- [x] Change a template
+- [x] Add an item to a template
+- [ ] Save templates to `localStorage`
 - [x] Create a list from a template
 - [ ] Add a list without template
 - [ ] Change a list
 - [ ] Create a template from a list
 - [x] Select a list
 - [ ] Add an item
-- [ ] Change an item
+- [x] Change an item in a list
 - [x] Mark an item as done
 - [ ] Add result to an item after completing (ah, and don't hide what you have done)
 - [ ] Sync state with a backend
