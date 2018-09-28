@@ -32,6 +32,21 @@ window.addEventListener('load', () => {
       </h1>`;
       document.getElementById('template-header').innerHTML = templateHeaderContent;
       
+      
+      const formatItemForTemplate = (item, template) => {
+        return `
+        <li class="${item.editing ? 'editing' : ''}" 
+            id="${item.id}">
+          ${item.editing ? 
+            `<input type="text" value="${item.title}" class="input-template-item-title" id="input-template-item-title-${template.id}-${item.id}" data-templateid=${template.id} data-itemid="${item.id}">
+              <a href='#' class="commit-template-item-title" data-listid="${template.id}" data-itemid="${item.id}">✓</a>
+              <a href='#' class="cancel-template-item-title" data-listid="${template.id}" data-itemid="${item.id}">𐄂</a>` 
+            :
+            `<span class="templateitem" id="${item.id}">${item.title}</span> <a href='#' class="edit-template-item-title" data-templateid=${template.id} data-itemid="${item.id}">✍︎</a>`
+          }
+        </li>`;
+      };
+      
       /* Show Templates */
       let templateContent = TEMPLATES.reduce((acc, t) => { 
         let html = `<li>
@@ -45,7 +60,7 @@ window.addEventListener('load', () => {
                         <a href='#' class="make-new-list-from-this" data-templateid="${t.id}">❏</a>
 
                         ${t.expanded ? `<ul>
-                          ${t.items.reduce((acc, item) => {return acc + `<li>${item.title}</li>`}, '')}
+                          ${t.items.reduce((acc, item) => {return acc + formatItemForTemplate(item, t); }, '')}
                           <li><a href='#' class="add-item-to-template" data-templateid="${t.id}">⊕</a></li>
                           </ul>` : ''} 
                     </li>`;
@@ -177,6 +192,71 @@ window.addEventListener('load', () => {
         });
       });
       
+      /* Edit item title */
+      Array.from(document.getElementsByClassName('edit-template-item-title')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid });
+          let item = template.items.find((i) => { return i.id === event.target.dataset.itemid });
+          item.editing = true;
+          render();
+        });
+      });
+
+      /* Commit item title*/
+      Array.from(document.getElementsByClassName('commit-template-item-title')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid });
+          let item = template.items.find((i) => { return i.id === event.target.dataset.itemid });
+          item.title = document.getElementById(`input-item-title-${template.id}-${item.id}`).value;
+          item.editing = false;
+          storage.setItem('state', JSON.stringify(state));
+          render();          
+        });
+      });
+
+      /* Cancel editing item title*/
+      Array.from(document.getElementsByClassName('cancel-template-item-title')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid });
+          let item = template.items.find((i) => { return i.id === event.target.dataset.itemid });
+          item.editing = false;
+          render();
+        });
+      });
+      
+      /* Commit/cancel template item title with enter/escape */
+      Array.from(document.getElementsByClassName('input-template-item-title')).map((el) => {
+        el.addEventListener('keyup', (event) => {
+          switch (event.keyCode) {
+            case 13 /* Enter */: 
+              event.preventDefault(); event.stopPropagation();
+              { 
+                let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid });
+                let item = template.items.find((i) => { return i.id === event.target.dataset.itemid });
+                item.title = document.getElementById(`input-template-item-title-${template.id}-${item.id}`).value;
+                item.editing = false;
+                storage.setItem('state', JSON.stringify(state));
+              }
+              render();
+              break;
+            case 27 /* Escape */: 
+              event.preventDefault(); event.stopPropagation();
+              {
+                let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid });
+                let item = template.items.find((i) => { return i.id === event.target.dataset.itemid });
+                item.editing = false;
+              }
+              render();
+              break;
+            default: break;
+          }
+        });
+      });
+      
+            
       /* Make list from template by clicking on it */
       Array.from(document.getElementsByClassName('make-new-list-from-this')).map((el) => {
         el.addEventListener('click', (event) => {
