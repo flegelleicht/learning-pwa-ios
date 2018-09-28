@@ -51,7 +51,7 @@ window.addEventListener('load', () => {
         <li class="${item.done ? 'done' : ''} ${item.editing ? 'editing' : ''}" 
             id="${item.id}">
           ${item.editing ? 
-            `<input type="text" value=${item.title} class="input-item-title" id="input-item-title-${list.id}-${item.id}" data-listid="${list.id}" data-itemid="${item.id}">
+            `<input type="text" value="${item.title}" class="input-item-title" id="input-item-title-${list.id}-${item.id}" data-listid="${list.id}" data-itemid="${item.id}">
               <a href='#' class="commit-item-title" data-listid="${list.id}" data-itemid="${item.id}">✓</a>
               <a href='#' class="cancel-item-title" data-listid="${list.id}" data-itemid="${item.id}">𐄂</a>` 
             :
