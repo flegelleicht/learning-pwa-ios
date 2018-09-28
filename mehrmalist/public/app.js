@@ -38,7 +38,7 @@ window.addEventListener('load', () => {
         <li class="${item.editing ? 'editing' : ''}" 
             id="${item.id}">
           ${item.editing ? 
-            `<input type="text" value="${item.title}" class="input-template-item-title" id="input-template-item-title-${template.id}-${item.id}" data-templateid=${template.id} data-itemid="${item.id}">
+            `<input type="text" value="${item.title}" class="input-template-item-title" id="input-template-item-title-${template.id}-${item.id}" data-templateid=${template.id} data-itemid="${item.id}" ${FOCUSSEDINPUTFIELDID === `input-template-item-title-${template.id}-${item.id}` ? 'autofocus' : ''}>
               <a href='#' class="commit-template-item-title" data-templateid="${template.id}" data-itemid="${item.id}">✓</a>
               <a href='#' class="cancel-template-item-title" data-templateid="${template.id}" data-itemid="${item.id}">𐄂</a>` 
             :
