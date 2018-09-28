@@ -24,7 +24,7 @@ window.addEventListener('load', () => {
       /* Show Templates */
       let templateContent = TEMPLATES.reduce((acc, t) => { 
         let html = `<li>
-                        ${t.editing ? `<input type="text" value="${t.title}" class="input-template-title" id="input-template-title-${t.id}" data-templateid=${t.id}>` :
+                        ${t.editing ? `<input type="text" value="${t.title}" class="input-template-title" id="input-template-title-${t.id}" data-templateid="${t.id}">` :
                         `<span class="template" id="${t.id}">${t.title}</span>`}
 
                         ${t.editing ? '' : `<a href='#' class="edit-template-title" data-templateid="${t.id}">✍︎</a>` }
@@ -46,12 +46,28 @@ window.addEventListener('load', () => {
       let listContent = lists.reduce((acc, l) => { return acc + `<li class="list" id="${l.id}">${l.title}</li>`}, "");
       document.getElementById('list-list').innerHTML = listContent;
     
+      const formatItemForList = (item, list) => {
+        return `
+        <li class="${item.done ? 'done' : ''} ${item.editing ? 'editing' : ''}" 
+            id="${item.id}">
+          ${item.editing ? 
+            `<input type="text" value=${item.title} class="input-item-title" id="input-item-title-${list.id}-${item.id}" data-listid="${list.id}" data-itemid="${item.id}">
+              <a href='#' class="commit-item-title" data-listid="${list.id}" data-itemid="${item.id}">✓</a>
+              <a href='#' class="cancel-item-title" data-listid="${list.id}" data-itemid="${item.id}">𐄂</a>` 
+            :
+            `<span class="listitem" id="${item.id}">${item.title}</span> <a href='#' class="edit-item-title" data-itemid=${item.id} data-listid="${list.id}">✍︎</a>`
+          }
+          
+        </li>`;
+      };
+      
       /* Show current list */
       if (currentListId) {
         let l = lists.find((l) => { return l.id === currentListId; });
         let currentListHeader = `${l.title}`;
         document.getElementById('list-header').innerHTML = currentListHeader;
-        let currentListItems = l.items.reduce((acc, item) => { return acc + `<li class="listitem ${item.done ? 'done' : ''}" id="${item.id}">${item.title}</li>`; }, "");
+        let currentListItems = l.items.reduce((acc, item) => { 
+          return acc + formatItemForList(item, l); }, "");
         document.getElementById('list-items').innerHTML = currentListItems;
       }
             
@@ -163,6 +179,43 @@ window.addEventListener('load', () => {
           render();          
         })
       });
+      
+      /* Edit item title */
+      Array.from(document.getElementsByClassName('edit-item-title')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+          let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
+          item.editing = true;
+          render();
+        });
+      });
+
+      /* Commit item title*/
+      Array.from(document.getElementsByClassName('commit-item-title')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+          let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
+          item.title = document.getElementById(`input-item-title-${list.id}-${item.id}`).value;
+          item.editing = false;
+          storage.setItem('lists', JSON.stringify(lists));
+          render();          
+        });
+      });
+
+      /* Cancel editing item title*/
+      Array.from(document.getElementsByClassName('cancel-item-title')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+          let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
+          item.editing = false;
+          render();
+        });
+      });
+      
+      
     };
     
     render();
