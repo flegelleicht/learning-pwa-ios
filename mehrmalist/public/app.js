@@ -1,16 +1,27 @@
 window.addEventListener('load', () => {
   const init = () => {
     let storage = window.localStorage;
-    let lists;
-    let currentListId;
+    let TEMPLATES;
+    let LISTS;
+    let CURRENTLISTID;
+    let FOCUSSEDINPUTFIELDID;
     
     /* Load / setup storage */
-    if (!storage.getItem('lists')) {
-      storage.setItem('lists', JSON.stringify([]));
-    } 
-    lists = JSON.parse(storage.getItem('lists'));
-    if (storage.getItem('currentListId')) {
-      currentListId = storage.getItem('currentListId');
+    if (!storage.getItem('state')) {
+      storage.setItem('state', JSON.stringify({
+        templates: [...DEFAULT_TEMPLATES],
+        lists: [],
+        currentListId: null,
+        focussedInputFieldId: null
+      }));
+    }    
+    
+    state = JSON.parse(storage.getItem('state'));
+    if (state) {
+      TEMPLATES = state.templates;
+      LISTS = state.lists;
+      CURRENTLISTID = state.currentListId;
+      FOCUSSEDINPUTFIELDID = state.focussedInputFieldId;
     }
         
     const render = () => {
@@ -43,7 +54,7 @@ window.addEventListener('load', () => {
       document.getElementById('template-list').innerHTML = templateContent;
     
       /* Show Lists */
-      let listContent = lists.reduce((acc, l) => { return acc + `<li class="list" id="${l.id}">${l.title}</li>`}, "");
+      let listContent = LISTS.reduce((acc, l) => { return acc + `<li class="list" id="${l.id}">${l.title}</li>`}, "");
       document.getElementById('list-list').innerHTML = listContent;
     
       const formatItemForList = (item, list) => {
@@ -61,8 +72,8 @@ window.addEventListener('load', () => {
       };
       
       /* Show current list */
-      if (currentListId) {
-        let l = lists.find((l) => { return l.id === currentListId; });
+      if (CURRENTLISTID) {
+        let l = LISTS.find((l) => { return l.id === CURRENTLISTID; });
         let currentListHeader = `${l.title}`;
         document.getElementById('list-header').innerHTML = currentListHeader;
         let currentListItems = l.items.reduce((acc, item) => { 
@@ -172,14 +183,13 @@ window.addEventListener('load', () => {
           event.preventDefault(); event.stopPropagation();
           let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
           let newList = {};
-          newList.id = `l_${lists.length + 1}`;
+          newList.id = `l_${LISTS.length + 1}`;
           newList.title = template.title;
           newList.items = [...template.items];
           
-          lists.push(newList);
-          currentListId = newList.id;
-          storage.setItem('lists', JSON.stringify(lists));
-          storage.setItem('currentListId', currentListId);
+          LISTS.push(newList);
+          state.currentListId = CURRENTLISTID = newList.id;
+          storage.setItem('state', JSON.stringify(state));
           render();
         });
       });
@@ -187,9 +197,9 @@ window.addEventListener('load', () => {
       /* Make list current list by clicking on it */
       Array.from(document.getElementsByClassName('list')).map((el) => {
         el.addEventListener('click', (event) => {
-          let list = lists.find((l) => { return l.id === event.target.id });
-          currentListId = list.id;
-          storage.setItem('currentListId', currentListId);
+          let list = LISTS.find((l) => { return l.id === event.target.id });
+          state.currentListId = CURRENTLISTID = list.id;
+          storage.setItem('state', JSON.stringify(state));
           render();
         });
       });
@@ -198,11 +208,11 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('add-item-to-list')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = lists.find((l) => { return l.id === event.target.dataset.listid });          
+          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });          
           let item = { id: `li_${list.items.length + 1}`, title: "Neuer Eintrag", editing: true };
           list.items.push(item);
           
-          storage.setItem('lists', JSON.stringify(lists));
+          storage.setItem('state', JSON.stringify(state));
           render();
         });
       });
@@ -211,11 +221,11 @@ window.addEventListener('load', () => {
       /* Mark item as done by clicking on it */
       Array.from(document.getElementsByClassName('listitem')).map((el) => {
         el.addEventListener('click', (event) => {
-          let list = lists.find((l) => { return l.id === currentListId });
+          let list = LISTS.find((l) => { return l.id === CURRENTLISTID });
           let item = list.items.find((item) => { return item.id === event.target.id });
           item.done = true;
           
-          storage.setItem('lists', JSON.stringify(lists));
+          storage.setItem('state', JSON.stringify(state));
           render();          
         })
       });
@@ -224,7 +234,7 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('edit-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
           let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
           item.editing = true;
           render();
@@ -235,11 +245,11 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('commit-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
           let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
           item.title = document.getElementById(`input-item-title-${list.id}-${item.id}`).value;
           item.editing = false;
-          storage.setItem('lists', JSON.stringify(lists));
+          storage.setItem('state', JSON.stringify(state));
           render();          
         });
       });
@@ -248,7 +258,7 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('cancel-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
           let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
           item.editing = false;
           render();
@@ -262,18 +272,18 @@ window.addEventListener('load', () => {
             case 13 /* Enter */: 
               event.preventDefault(); event.stopPropagation();
               { 
-                let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+                let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
                 let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
                 item.title = document.getElementById(`input-item-title-${list.id}-${item.id}`).value;
                 item.editing = false;
-                storage.setItem('lists', JSON.stringify(lists));
+                storage.setItem('state', JSON.stringify(state));
               }
               render();
               break;
             case 27 /* Escape */: 
               event.preventDefault(); event.stopPropagation();
               {
-                let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+                let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
                 let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
                 item.editing = false;
               }
