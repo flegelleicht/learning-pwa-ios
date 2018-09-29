@@ -117,8 +117,8 @@ window.addEventListener('load', () => {
               <a href='#' class="commit-item-title" data-listid="${list.id}" data-itemid="${item.id}">✓</a>
               <a href='#' class="cancel-item-title" data-listid="${list.id}" data-itemid="${item.id}">𐄂</a>` 
             :
-            `<span class="listitem" id="${item.id}">${item.title}</span>
-             ${item.done ? '' : `<a href='#' class="edit-item-title" data-itemid=${item.id} data-listid="${list.id}">✍︎</a>`}`
+            `<span class="listitem" id="${item.id}">${item.title}
+             ${item.done ? '' : `<a href='#' class="edit-item-title" data-itemid=${item.id} data-listid="${list.id}">✍︎</a>`}</span>`
           }
         </li>`;
       };
@@ -130,7 +130,9 @@ window.addEventListener('load', () => {
         document.getElementById('list-header').innerHTML = currentListHeader;
         let currentListItems = l.items.reduce((acc, item) => { 
           return acc + formatItemForList(item, l); }, "");
-        let allListItems = currentListItems + `<li><a href='#' class="add-item-to-list" data-listid="${l.id}">+</a></li>`;
+        let allListItems = currentListItems + `
+          
+          <li><input type="text" class="quickentry-add-item-to-list" data-listid="${l.id}" placeholder="+ Eintrag" value=""></li>` ;
         document.getElementById('list-items').innerHTML = allListItems;
       }
             
@@ -421,6 +423,32 @@ window.addEventListener('load', () => {
         });
       });
       
+      /* Add an item to a list directly via textbox */
+      Array.from(document.getElementsByClassName('quickentry-add-item-to-list')).map((el) => {
+        el.addEventListener('keyup', (event) => {
+          switch (event.keyCode) {
+            case 13 /* Enter */: 
+              event.preventDefault(); event.stopPropagation();
+              { 
+                let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
+                let text = event.target.value;
+                let item = { id: `li_${list.items.length + 1}`, title: text, editing: false };
+                list.items.push(item);
+                storage.setItem('state', JSON.stringify(state));
+              }
+              render();
+              break;
+            case 27 /* Escape */: 
+              event.preventDefault(); event.stopPropagation();
+              {
+                event.target.value = '';
+              }
+              render();
+              break;
+            default: break;
+          }
+        });
+      });
       
       /* Toggle item's “done” status by clicking on it */
       Array.from(document.getElementsByClassName('listitem')).map((el) => {
