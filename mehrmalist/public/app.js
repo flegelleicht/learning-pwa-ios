@@ -128,12 +128,16 @@ window.addEventListener('load', () => {
         let l = LISTS.find((l) => { return l.id === CURRENTLISTID; });
         let currentListHeader = `Liste: ${l.title}`;
         document.getElementById('list-header').innerHTML = currentListHeader;
-        let currentListItems = l.items.reduce((acc, item) => { 
-          return acc + formatItemForList(item, l); }, "");
-        let allListItems = currentListItems + `
-          
-          <li><input type="text" class="quickentry-add-item-to-list" data-listid="${l.id}" placeholder="+ Eintrag" value=""></li>` ;
-        document.getElementById('list-items').innerHTML = allListItems;
+        
+        let todoListItems = l.items.filter(item => !item.done);
+        let completedListItems = l.items.filter(item => item.done);
+        
+        html = '';
+        html = todoListItems.reduce((acc, item) => { return acc + formatItemForList(item, l); }, html);
+        html = html + `<li><input type="text" class="quickentry-add-item-to-list" data-listid="${l.id}" placeholder="+ Eintrag" value=""></li>`;
+        html = completedListItems.reduce((acc, item) => { return acc + formatItemForList(item, l); }, html);
+        
+        document.getElementById('list-items').innerHTML = html;
       }
             
       /* Toggle template list expansion by clicking on it */
