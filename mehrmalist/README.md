@@ -30,6 +30,7 @@ Uses `localStorage` to save your lists and items.
 - [x] Show template details
 - [x] Add a new template
 - [x] Change a template
+- [ ] Delete a template
 - [x] Add an item to a template
 - [x] Change an item in a template
 - [x] Save templates to `localStorage`
@@ -38,9 +39,11 @@ Uses `localStorage` to save your lists and items.
 - [x] Change a list
 - [ ] Create a template from a list
 - [x] Select a list
+- [ ] Delete a list
 - [x] Add an item to a list
 - [x] Change an item in a list
 - [x] Mark an item as done
+- [ ] Delete an item
 - [ ] Commit editing on enter (⏎)
 - [ ] Cancel editing on esc (⎋)
 - [ ] Continue entering items on shift+enter (⇧+⏎)
