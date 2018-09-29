@@ -117,8 +117,14 @@
       box-sizing:border-box;
       padding:0.2em;
       font-size:inherit;
-      background-color:#eee;
+      background-color: var(--ml-color);
+      color: var(--ml-backgroundColor);
       padding-left:1rem;
+      opacity: 0.75;
+    }
+    
+    .quickentry-add-item-to-list::placeholder {
+      color: var(--ml-backgroundColor);
     }
     
     .edit-item-title:hover {
