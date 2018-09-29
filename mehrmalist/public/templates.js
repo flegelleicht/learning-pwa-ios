@@ -1,7 +1,7 @@
 const DEFAULT_TEMPLATES = [
   {
     id: "t_1",
-    title: "Einkauf",
+    title: "Wocheneinkauf",
     items: [
       /* Frühstück */
       { id: "ti_1",   title: "Brot" },
