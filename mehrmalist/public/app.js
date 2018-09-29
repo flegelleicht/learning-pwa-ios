@@ -77,7 +77,25 @@ window.addEventListener('load', () => {
       
       
       /* Show Lists */
-      let listContent = LISTS.reduce((acc, l) => { return acc + `<li class="list" id="${l.id}">${l.title}</li>`}, "");
+      let listContent = LISTS.reduce((acc, l) => { 
+        let html = `<li>
+                      ${l.editing ? 
+                        `<input 
+                          type="text" 
+                          value="${l.title}" 
+                          class="input-list-title" 
+                          id="input-list-title-${l.id}" 
+                          data-listid="${l.id}" 
+                          ${FOCUSSEDINPUTFIELDID === `input-list-title-${l.id}` ? 'autofocus': ''}
+                          >
+                        <a href='#' class="commit-list-title" data-listid="${l.id}">✓</a> <a href='#' class="cancel-list-title" data-listid="${l.id}">𐄂</a>`
+                        : 
+                        `<span class="list" id="${l.id}">${l.title}</span>
+                        <a href='#' class="edit-list-title" data-listid="${l.id}">✍︎</a>`
+                      }
+                    </li>`;
+        return acc + html
+      }, "");
       document.getElementById('list-list').innerHTML = listContent;
     
       const formatItemForList = (item, list) => {
@@ -290,7 +308,7 @@ window.addEventListener('load', () => {
         });
       });
       
-      /* Add a new template to templates */
+      /* Make a new list without a template */
       let makeNewList = document.getElementById('make-new-list');
       if (makeNewList) {
         makeNewList.addEventListener('click', (event) => {
@@ -304,7 +322,68 @@ window.addEventListener('load', () => {
         });
       }
       
+      /* Enable item title editing */
+      Array.from(document.getElementsByClassName('edit-list-title')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid; });
+          list.editing = true;
+          FOCUSSEDINPUTFIELDID = `input-list-title-${list.id}`;
+          render();
+        });
+      });
       
+      
+      /* Commit list title*/
+      Array.from(document.getElementsByClassName('commit-list-title')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid; } );
+          list.title = document.getElementById(`input-list-title-${list.id}`).value;
+          list.editing = false;
+          storage.setItem('state', JSON.stringify(state));
+          render();
+        });
+      });
+      
+      /* Commit/cancel template title with enter/escape */
+      Array.from(document.getElementsByClassName('input-list-title')).map((el) => {
+        el.addEventListener('keyup', (event) => {
+          switch (event.keyCode) {
+            case 13 /* Enter */: 
+              event.preventDefault(); event.stopPropagation();
+              { 
+                let list = LISTS.find((l) => { return l.id === event.target.dataset.listid; } );
+                list.title = document.getElementById(`input-list-title-${list.id}`).value;
+                list.editing = false;
+                storage.setItem('state', JSON.stringify(state));
+              }
+              render();
+              break;
+            case 27 /* Escape */: 
+              event.preventDefault(); event.stopPropagation();
+              {
+                let list = LISTS.find((l) => { return l.id === event.target.dataset.listid; } );
+                list.editing = false;
+                storage.setItem('state', JSON.stringify(state));
+              }
+              render();
+              break;
+            default: break;
+          }
+        });
+      });
+
+      /* Cancel editing template title*/
+      Array.from(document.getElementsByClassName('cancel-list-title')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid; } );
+          list.editing = false;
+          render();
+        });
+      });
+            
       /* Make list current list by clicking on it */
       Array.from(document.getElementsByClassName('list')).map((el) => {
         el.addEventListener('click', (event) => {
