@@ -21,7 +21,7 @@ Uses `localStorage` to save your lists and items.
 
 - [x] Basic styling
 - [x] All on one page
-- [ ] Add CSS styles
+- [x] Add CSS styles
 - [ ] Subsections
 
 ### Functionality
