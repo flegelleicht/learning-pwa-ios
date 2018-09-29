@@ -422,12 +422,12 @@ window.addEventListener('load', () => {
       });
       
       
-      /* Mark item as done by clicking on it */
+      /* Toggle item's “done” status by clicking on it */
       Array.from(document.getElementsByClassName('listitem')).map((el) => {
         el.addEventListener('click', (event) => {
           let list = LISTS.find((l) => { return l.id === CURRENTLISTID });
           let item = list.items.find((item) => { return item.id === event.target.id });
-          item.done = true;
+          item.done = !item.done;
           
           storage.setItem('state', JSON.stringify(state));
           render();          
