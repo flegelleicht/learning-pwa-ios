@@ -130,7 +130,7 @@ window.addEventListener('load', () => {
         document.getElementById('list-header').innerHTML = currentListHeader;
         let currentListItems = l.items.reduce((acc, item) => { 
           return acc + formatItemForList(item, l); }, "");
-        let allListItems = currentListItems + `<li><a href='#' class="add-item-to-list" data-listid="${l.id}">⊕</a></li>`;
+        let allListItems = currentListItems + `<li><a href='#' class="add-item-to-list" data-listid="${l.id}">+</a></li>`;
         document.getElementById('list-items').innerHTML = allListItems;
       }
             
