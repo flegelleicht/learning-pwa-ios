@@ -50,8 +50,16 @@ window.addEventListener('load', () => {
       /* Show Templates */
       let templateContent = TEMPLATES.reduce((acc, t) => { 
         let html = `<li>
-                        ${t.editing ? `<input type="text" value="${t.title}" class="input-template-title" id="input-template-title-${t.id}" data-templateid="${t.id}">` :
-                        `<span class="template" id="${t.id}">${t.title}</span>`}
+                        ${t.editing ? 
+                          `<input 
+                            type="text" 
+                            value="${t.title}" 
+                            class="input-template-title" 
+                            id="input-template-title-${t.id}" 
+                            data-templateid="${t.id}"
+                            ${FOCUSSEDINPUTFIELDID === `input-template-title-${t.id}` ? 'autofocus': ''}>` 
+                          :
+                          `<span class="template" id="${t.id}">${t.title}</span>`}
 
                         ${t.editing ? '' : `<a href='#' class="edit-template-title" data-templateid="${t.id}">✍︎</a>` }
                         
@@ -154,6 +162,7 @@ window.addEventListener('load', () => {
           event.preventDefault(); event.stopPropagation();
           let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
           template.editing = true;
+          FOCUSSEDINPUTFIELDID = `input-template-title-${template.id}`;
           render();
         });
       });
