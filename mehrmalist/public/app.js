@@ -57,13 +57,12 @@ window.addEventListener('load', () => {
                             class="input-template-title" 
                             id="input-template-title-${t.id}" 
                             data-templateid="${t.id}"
-                            ${FOCUSSEDINPUTFIELDID === `input-template-title-${t.id}` ? 'autofocus': ''}>` 
+                            ${FOCUSSEDINPUTFIELDID === `input-template-title-${t.id}` ? 'autofocus': ''}>
+                            <a href='#' class="commit-template-title" data-templateid="${t.id}">✓</a> <a href='#' class="cancel-template-title" data-templateid="${t.id}">𐄂</a>
+                          ` 
                           :
-                          `<span class="template" id="${t.id}">${t.title}</span>`}
-
-                        ${t.editing ? '' : `<a href='#' class="edit-template-title" data-templateid="${t.id}">✍︎</a>` }
-                        
-                        ${t.editing ? `<a href='#' class="commit-template-title" data-templateid="${t.id}">✓</a> <a href='#' class="cancel-template-title" data-templateid="${t.id}">𐄂</a>` : '' }
+                          `<span class="template" id="${t.id}">${t.title}</span>
+                          <a href='#' class="edit-template-title" data-templateid="${t.id}">✍︎</a>`}
 
                         <a href='#' class="make-new-list-from-this" data-templateid="${t.id}">❏</a>
 
