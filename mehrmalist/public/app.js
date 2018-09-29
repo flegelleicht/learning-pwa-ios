@@ -165,6 +165,7 @@ window.addEventListener('load', () => {
           let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
           template.title = document.getElementById(`input-template-title-${template.id}`).value;
           template.editing = false;
+          storage.setItem('state', JSON.stringify(state));
           render();
         });
       });
@@ -179,6 +180,7 @@ window.addEventListener('load', () => {
                 let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
                 template.title = document.getElementById(`input-template-title-${template.id}`).value;
                 template.editing = false;
+                storage.setItem('state', JSON.stringify(state));
               }
               render();
               break;
