@@ -6,11 +6,11 @@
 	<meta http-equiv="Expires" content="0" />    
 	<meta charset="utf-8">
 	<meta name="author" content="Erik Hebisch">
-	<meta name="viewport" content="width=device-width, height=device-height, maximum-scale=1, minimum-scale=1, user-scalable=no">
+	<meta name="viewport" content="width=device-width, height=device-height, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 	
 	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   <link rel="apple-touch-startup-image" href="/mehrmalist/icons/apple_splash_640.png"  media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
   <link rel="apple-touch-startup-image" href="/mehrmalist/icons/apple_splash_750.png"  media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
@@ -39,53 +39,61 @@
   <style>
     /*! minireset.css v0.0.3 | MIT License | github.com/jgthms/minireset.css */html,body,p,ol,ul,li,dl,dt,dd,blockquote,figure,fieldset,legend,textarea,pre,iframe,hr,h1,h2,h3,h4,h5,h6{margin:0;padding:0}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal}ul{list-style:none}button,input,select,textarea{margin:0}html{box-sizing:border-box}*,*:before,*:after{box-sizing:inherit}img,embed,iframe,object,audio,video{height:auto;max-width:100%}iframe{border:0}table{border-collapse:collapse;border-spacing:0}td,th{padding:0;text-align:left}
     html {
+      --ml-color: #ffd479;
+      --ml-backgroundColor: #400080;
+      --ml-borderColor: var(--ml-color);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
           "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
           "Droid Sans", "Helvetica Neue", sans-serif;
+      background-color: var(--ml-backgroundColor);
+      color: var(--ml-color);
     }
-    body { padding: 2em; padding-bottom:5em; }
-    h1 { font-size: 2em; margin-top: 1em; margin-bottom: 0.5em; border-top: 1px solid black; }
-    a { text-decoration: none; color: black; }
-    ul { padding-left: 1em; }
-    li { line-height: 1.4em; }
+    h1 { 
+      font-size: 2rem; 
+      font-weight: bold;
+      margin-bottom: 0.5em; 
+      margin-top: 1rem; 
+      padding-left: 1rem; 
+    }
+    a { 
+      color: var(--ml-color);
+      text-decoration: none; 
+    }
+    ul { padding-left: 2rem; }
+    li { padding: 0.25rem 0;}
     li.done { opacity: 0.2; }
-    span { padding: 0.2em 0.2em; border-radius: 5px; cursor: pointer; }
-    span.currentList { background-color: black; color: white; }
+    .listitem, span { cursor: pointer; }
+    span.currentList { background-color: var(--ml-color); color: var(--ml-backgroundColor); }
 /*    #list-items {
       columns:2;
       column-gap:1em;
     }*/
     #list-items {
+      padding:0;
       display:flex;
       flex-wrap: wrap;
       align-items: center;
     }
     #list-items li {
+      padding: 0.5rem 0 0.5rem 2rem;
       box-sizing: border-box;
-      line-height: 1.6em;
-      margin-bottom: 0.4em;
-      margin-right: 3%;
       display:block;
-      width: 30%;
+      width: 100%;
     }
-    
-    @media (max-device-width: 1024px) { 
-      #list-items li {
-        width: 90%;
-      }
+    .bordered {
+      border-bottom: 1px solid var(--ml-borderColor);
     }
-    
     #list-items li .edit-item-title {
       float:right;
-      margin-right:0.5em;
+      padding:0 2rem;
+      height:100%;
     }
     #list-items li span {
-      display: inline-block;
       width: 100%;
-      border-radius: 6px;
-      border: 1px solid black;
     }
-    
+    #list-items > li:nth-child(1) {
+      border-top: 1px solid var(--ml-borderColor);
+    }
     .add-item-to-list {
       display: inline-block;
       width: calc(100% - 6em);
@@ -95,6 +103,9 @@
       text-align: center;
       position:relative;
       top:0.2em;
+    }
+    li.quickentry {
+      padding-left:0 !important;
     }
     .quickentry-add-item-to-list {
       width:100%;
@@ -107,6 +118,11 @@
       padding:0.2em;
       font-size:inherit;
       background-color:#eee;
+      padding-left:1rem;
+    }
+    
+    .edit-item-title:hover {
+      background-color: #ddd;
     }
   </style>
 </head>

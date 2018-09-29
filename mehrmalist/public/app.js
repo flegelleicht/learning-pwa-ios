@@ -110,14 +110,14 @@ window.addEventListener('load', () => {
     
       const formatItemForList = (item, list) => {
         return `
-        <li class="${item.done ? 'done' : ''} ${item.editing ? 'editing' : ''}" 
+        <li class="listitem bordered ${item.done ? 'done' : ''} ${item.editing ? 'editing' : ''}" 
             id="${item.id}">
           ${item.editing ? 
             `<input type="text" value="${item.title}" class="input-item-title" id="input-item-title-${list.id}-${item.id}" data-listid="${list.id}" data-itemid="${item.id}" ${FOCUSSEDINPUTFIELDID === `input-item-title-${list.id}-${item.id}` ? 'autofocus' : ''}>
               <a href='#' class="commit-item-title" data-listid="${list.id}" data-itemid="${item.id}">✓</a>
               <a href='#' class="cancel-item-title" data-listid="${list.id}" data-itemid="${item.id}">𐄂</a>` 
             :
-            `<span class="listitem" id="${item.id}">${item.title}
+            `<span class="listitem-title" id="listitem-title-${item.id}">${item.title}
              ${item.done ? '' : `<a href='#' class="edit-item-title" data-itemid=${item.id} data-listid="${list.id}">✍︎</a>`}</span>`
           }
         </li>`;
@@ -134,7 +134,7 @@ window.addEventListener('load', () => {
         
         html = '';
         html = todoListItems.reduce((acc, item) => { return acc + formatItemForList(item, l); }, html);
-        html = html + `<li><input type="text" class="quickentry-add-item-to-list" data-listid="${l.id}" placeholder="+ Eintrag" value=""></li>`;
+        html = html + `<li class="quickentry"><input type="text" class="quickentry-add-item-to-list" data-listid="${l.id}" placeholder="+ Eintrag" value=""></li>`;
         html = completedListItems.reduce((acc, item) => { return acc + formatItemForList(item, l); }, html);
         
         document.getElementById('list-items').innerHTML = html;
