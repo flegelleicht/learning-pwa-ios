@@ -68,6 +68,14 @@ window.addEventListener('load', () => {
       }, "");
       document.getElementById('template-list').innerHTML = templateContent;
     
+      const listHeaderContent = `
+        <h1>Lists
+          <a href="#" id="make-new-list">⊕</a>
+        </h1>
+      `;
+      document.getElementById('lists-header').innerHTML = listHeaderContent;
+      
+      
       /* Show Lists */
       let listContent = LISTS.reduce((acc, l) => { return acc + `<li class="list" id="${l.id}">${l.title}</li>`}, "");
       document.getElementById('list-list').innerHTML = listContent;
@@ -281,6 +289,21 @@ window.addEventListener('load', () => {
           render();
         });
       });
+      
+      /* Add a new template to templates */
+      let makeNewList = document.getElementById('make-new-list');
+      if (makeNewList) {
+        makeNewList.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          let l = { id: `l_${LISTS.length + 1}`, title: 'Neue Liste', items: [], editing: true };
+          // FOCUSSEDINPUTFIELDID =
+          LISTS.push(l);
+          state.currentListId = CURRENTLISTID = l.id;
+          storage.setItem('state', JSON.stringify(state));
+          render();
+        });
+      }
+      
       
       /* Make list current list by clicking on it */
       Array.from(document.getElementsByClassName('list')).map((el) => {
