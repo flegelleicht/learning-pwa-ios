@@ -37,13 +37,41 @@
   <title>Mehrmalist</title>
   
   <style>
-    li.done {
-      text-decoration: line-through;
-      display: none;
+    /*! minireset.css v0.0.3 | MIT License | github.com/jgthms/minireset.css */html,body,p,ol,ul,li,dl,dt,dd,blockquote,figure,fieldset,legend,textarea,pre,iframe,hr,h1,h2,h3,h4,h5,h6{margin:0;padding:0}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal}ul{list-style:none}button,input,select,textarea{margin:0}html{box-sizing:border-box}*,*:before,*:after{box-sizing:inherit}img,embed,iframe,object,audio,video{height:auto;max-width:100%}iframe{border:0}table{border-collapse:collapse;border-spacing:0}td,th{padding:0;text-align:left}
+    html {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+          "Droid Sans", "Helvetica Neue", sans-serif;
     }
-    #list-items { /* ul */
-      columns:3;
+    body { padding: 2em; }
+    h1 { font-size: 2em; margin-top: 1em; margin-bottom: 0.5em; border-top: 1px solid black; }
+    a { text-decoration: none; color: black; }
+    ul { padding-left: 1em; }
+    li { line-height: 1.4em; }
+    li.done { opacity: 0.2; }
+    span { padding: 0.2em 0.2em; border-radius: 5px; cursor: pointer; }
+    span.currentList { background-color: black; color: white; }
+/*    #list-items {
+      columns:2;
       column-gap:1em;
+    }*/
+    #list-items li {
+      box-sizing: border-box;
+      line-height: 1.6em;
+      margin-bottom: 0.4em;
+      float: left;
+      display:block;
+      width: 30%;
+    }
+    #list-items li .edit-item-title {
+      position: relative;
+      left: -2em;
+    }
+    #list-items li span {
+      display: inline-block;
+      width: calc(100% - 2em);
+      border-radius: 6px;
+      border: 1px solid black;
     }
   </style>
 </head>

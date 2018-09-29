@@ -27,7 +27,7 @@ window.addEventListener('load', () => {
     const render = () => {
       /* Show templates header */
       const templateHeaderContent = `
-      <h1>Templates 
+      <h1>Vorlagen 
         <a href="#" id="make-new-template">⊕</a>
       </h1>`;
       document.getElementById('template-header').innerHTML = templateHeaderContent;
@@ -76,7 +76,7 @@ window.addEventListener('load', () => {
       document.getElementById('template-list').innerHTML = templateContent;
     
       const listHeaderContent = `
-        <h1>Lists
+        <h1>Listen
           <a href="#" id="make-new-list">⊕</a>
         </h1>
       `;
@@ -97,7 +97,10 @@ window.addEventListener('load', () => {
                           >
                         <a href='#' class="commit-list-title" data-listid="${l.id}">✓</a> <a href='#' class="cancel-list-title" data-listid="${l.id}">𐄂</a>`
                         : 
-                        `<span class="list" id="${l.id}">${l.title}</span>
+                        `<span 
+                            class="list ${CURRENTLISTID === l.id ? `currentList` : ''}" 
+                            id="${l.id}"
+                          >${l.title}</span>
                         <a href='#' class="edit-list-title" data-listid="${l.id}">✍︎</a>`
                       }
                     </li>`;
@@ -114,7 +117,8 @@ window.addEventListener('load', () => {
               <a href='#' class="commit-item-title" data-listid="${list.id}" data-itemid="${item.id}">✓</a>
               <a href='#' class="cancel-item-title" data-listid="${list.id}" data-itemid="${item.id}">𐄂</a>` 
             :
-            `<span class="listitem" id="${item.id}">${item.title}</span> <a href='#' class="edit-item-title" data-itemid=${item.id} data-listid="${list.id}">✍︎</a>`
+            `<span class="listitem" id="${item.id}">${item.title}</span>
+             ${item.done ? '' : `<a href='#' class="edit-item-title" data-itemid=${item.id} data-listid="${list.id}">✍︎</a>`}`
           }
         </li>`;
       };
@@ -122,7 +126,7 @@ window.addEventListener('load', () => {
       /* Show current list */
       if (CURRENTLISTID) {
         let l = LISTS.find((l) => { return l.id === CURRENTLISTID; });
-        let currentListHeader = `${l.title}`;
+        let currentListHeader = `Liste: ${l.title}`;
         document.getElementById('list-header').innerHTML = currentListHeader;
         let currentListItems = l.items.reduce((acc, item) => { 
           return acc + formatItemForList(item, l); }, "");
