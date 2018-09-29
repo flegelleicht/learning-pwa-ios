@@ -46,6 +46,7 @@ Uses `localStorage` to save your lists and items.
 - [ ] Continue entering items on shift+enter (⇧+⏎)
 - [ ] Add result to an item after completing (ah, and don't hide what you have done)
 - [ ] Sync state with a backend
+- [ ] Put completed items at the end of the list
 
 ### Implementation
 
