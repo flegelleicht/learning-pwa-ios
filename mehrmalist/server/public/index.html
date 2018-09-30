@@ -133,12 +133,16 @@
 </head>
 
 <body>
-  <div id="template-header"></div>
-  <ul id="template-list"></ul>
-  <div id="lists-header"></div>
-  <ul id="list-list"></ul>
-  <h1 id="list-header"></h1>
-  <ul id="list-items"></ul>
+  <div id="login"></div>
+  <div id="logout"></div>
+  <div id="content">
+    <div id="template-header"></div>
+    <ul id="template-list"></ul>
+    <div id="lists-header"></div>
+    <ul id="list-list"></ul>
+    <h1 id="list-header"></h1>
+    <ul id="list-items"></ul>
+  </div>
   
   <script>
     if('serviceWorker' in navigator) {
@@ -154,7 +158,6 @@
       })
     }
   </script>
-  <script type="text/javascript" src="token.js"></script>
   <script type="text/javascript"  src="templates.js"></script>
   <script type="text/javascript" src="app.js"></script>
 </body>

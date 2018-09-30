@@ -5,9 +5,8 @@ window.addEventListener('load', () => {
     let LISTS;
     let CURRENTLISTID;
     let FOCUSSEDINPUTFIELDID;
-
-    let TOKEN = AUTH_TOKEN;
-    let UPDATEOPTIONS = {method: 'POST', headers: {'Authorization': `Bearer ${TOKEN}`}};
+    let TOKEN;
+    let UPDATEOPTIONS = () => {return {method: 'POST', headers: {'Authorization': `Bearer ${TOKEN}`}}};
     
     /* Load / setup storage */
     if (!storage.getItem('state')) {
@@ -16,6 +15,7 @@ window.addEventListener('load', () => {
         lists: [],
         currentListId: null,
         focussedInputFieldId: null,
+        authToken : '',
         latestSeenUpdate: 0
       }));
     }    
@@ -27,6 +27,7 @@ window.addEventListener('load', () => {
       CURRENTLISTID = state.currentListId;
       FOCUSSEDINPUTFIELDID = state.focussedInputFieldId;
       state.latestSeenUpdate = state.latestSeenUpdate || 0;
+      state.status = state.status || 'logged-out';
     }
     
     const handleUpdate = (update) => {
@@ -56,18 +57,79 @@ window.addEventListener('load', () => {
       }
     }
     
-    let updates = new EventSource(`api/v1/updatestream?since=${state.latestSeenUpdate}&token=${TOKEN}`)
-    updates.onmessage = (e) => {
-      update = JSON.parse(e.data);
-      if (handleUpdate(update)) {
-        state.latestSeenUpdate = update.id;
-        storage.setItem('state', JSON.stringify(state));
-        render();
+    let updates;
+    const startUpdates = () => {
+      updates = new EventSource(`api/v1/updatestream?since=${state.latestSeenUpdate}&token=${TOKEN}`);
+      updates.onmessage = (e) => {
+        update = JSON.parse(e.data);
+        if (handleUpdate(update)) {
+          state.latestSeenUpdate = update.id;
+          storage.setItem('state', JSON.stringify(state));
+          render();
+        }
       }
     }
     
         
     const render = () => {
+      if (state.status === 'logged-out') {
+        
+        document.getElementById('content').innerHTML = `
+          <div id="template-header"></div>
+          <ul id="template-list"></ul>
+          <div id="lists-header"></div>
+          <ul id="list-list"></ul>
+          <h1 id="list-header"></h1>
+          <ul id="list-items"></ul>
+        `;
+        let logout = document.getElementById('logout').style.display = 'none';
+        let login = document.getElementById('login');
+        login.style.display = 'block';
+        login.innerHTML = `
+          <form id="login-form">
+            <input type="text" id="login-user" value="" placeholder="Nutzer">
+            <input type="password" id="login-pass" value="" placeholder="Passwort">
+            <input type="submit" value="Senden">
+          </form>`;
+        
+        let loginForm = document.getElementById('login-form');
+        loginForm.addEventListener('submit', (event) => {
+          event.preventDefault();
+          let user = document.getElementById('login-user').value;
+          let pass = document.getElementById('login-pass').value;
+          
+          fetch('api/v1/login', {
+            method: 'POST',
+            body: JSON.stringify({user: user, pass: pass})
+          })
+          .then(response => {
+            if (response.ok) {
+              response.json().then(json => {
+                state.authToken = TOKEN = json.token;
+                state.status = 'logged-in';
+                storage.setItem('state', JSON.stringify(state));
+                startUpdates();
+                render();
+              });
+            }
+          })
+          .catch(error => console.error(error));
+        });
+        return;
+      }
+
+      document.getElementById('login').style.display = 'none';
+      let logout = document.getElementById('logout');
+      logout.style.display = 'block';
+      logout.innerHTML = `<button id="logout-button">Ausloggen</button>`;
+      document.getElementById('logout-button').addEventListener('click', (event) => {
+        state.authToken = '';
+        state.status = 'logged-out';
+        if (updates) updates.close();
+        storage.setItem('state', JSON.stringify(state));
+        render();
+      });
+      
       /* Show templates header */
       const templateHeaderContent = `
       <h1>Vorlagen 
@@ -205,7 +267,7 @@ window.addEventListener('load', () => {
           let t = { id: `t_${Math.random().toString(36).substr(2)}`, title: "Neue Vorlage", items: [], expanded: false };
           TEMPLATES.push(t);
           
-          fetch('api/v1/update', Object.assign({body: JSON.stringify({action: 'make-new-template', params: {id: t.id, title: t.title}})}, UPDATEOPTIONS)).then(r => console.log(r)).catch(e => console.error(e));
+          fetch('api/v1/update', Object.assign({body: JSON.stringify({action: 'make-new-template', params: {id: t.id, title: t.title}})}, UPDATEOPTIONS())).then(r => console.log(r)).catch(e => console.error(e));
           
           render();
         });
@@ -231,7 +293,7 @@ window.addEventListener('load', () => {
           template.editing = false;
           storage.setItem('state', JSON.stringify(state));
           
-          fetch('api/v1/update', Object.assign({body: JSON.stringify({action: 'commit-template-title', params: {id: template.id, title: template.title}})}, UPDATEOPTIONS)).then(r => console.log(r)).catch(e => console.error(e));
+          fetch('api/v1/update', Object.assign({body: JSON.stringify({action: 'commit-template-title', params: {id: template.id, title: template.title}})}, UPDATEOPTIONS())).then(r => console.log(r)).catch(e => console.error(e));
           
           render();
         });
@@ -249,7 +311,7 @@ window.addEventListener('load', () => {
                 template.editing = false;
                 storage.setItem('state', JSON.stringify(state));
 
-                fetch('api/v1/update', Object.assign({body: JSON.stringify({action: 'commit-template-title', params: {id: template.id, title: template.title}})}, UPDATEOPTIONS)).then(r => console.log(r)).catch(e => console.error(e));
+                fetch('api/v1/update', Object.assign({body: JSON.stringify({action: 'commit-template-title', params: {id: template.id, title: template.title}})}, UPDATEOPTIONS())).then(r => console.log(r)).catch(e => console.error(e));
               }
               render();
               break;
