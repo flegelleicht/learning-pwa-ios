@@ -6,6 +6,7 @@
 require 'sinatra/base'
 require 'jwt'
 require 'json'
+require 'pp'
 
 class Application < Sinatra::Base
   class JwtAuth
@@ -15,15 +16,15 @@ class Application < Sinatra::Base
 
     def call env
       begin
-        if env.fetch('PATH_INFO', '') =~ /(^\/api\/v1$)/
-          if env.fetch('PATH_INFO', '') !~ /\/login$/ 
+        if env.fetch('PATH_INFO', '') =~ /(^\/api\/v1)/
+          if env.fetch('PATH_INFO', '') !~ /\/login$/
             options = { algorithm: 'HS256', iss: ENV['MEHRMALIST_JWT_ISSUER'] }
             bearer = env.fetch('HTTP_AUTHORIZATION', '').slice(7..-1)
-            puts "\n\n#{bearer}\n\n"
             payload, header = JWT.decode bearer, ENV['MEHRMALIST_JWT_SECRET'], true, options
-
             env[:scopes] = payload['scopes']
+            puts "#{payload['scopes']}"
             env[:user] = payload['user']
+            puts "#{payload['user']}"
           end
         end
 
@@ -47,6 +48,7 @@ class Application < Sinatra::Base
     @account = {
       "#{ENV['MEHRMALIST_USER']}" => "#{ENV['MEHRMALIST_PASS']}"
     }
+    @@updates = {}
   end
   
   configure do
@@ -102,8 +104,45 @@ class Application < Sinatra::Base
   end
   
   get '/api/v1/state' do
+    pp request.env
     content_type 'text/javascript'
-    {}.to_json
+    {message: 'Here’s your state'}.to_json
+  end
+  
+  get '/api/v1/updates' do
+    resp = []
+    username = request.env[:user]['username'].to_sym
+    updates = @@updates[username]
+    pp updates
+    if updates
+      if params['since']
+        lastSeen = params['since'].to_i
+        resp = updates.select {|u| u[:id] > lastSeen}
+      else
+        resp = updates
+      end
+    end
+    content_type 'text/javascript'
+    resp.to_json
+  end
+  
+  post '/api/v1/update' do
+    user = request.env[:user]
+    pp user
+    username = user['username'].to_sym
+    unless (@@updates[username])
+      @@updates[username] = []
+    end
+    update = {
+      id: @@updates[username].length + 1,
+      at: Time.now.to_i,
+      upd: @req
+    }
+    @@updates[username] << update
+    pp update
+    
+    content_type 'text/javascript'
+    {message: 'Update successful'}.to_json
   end
 
   def self.run!

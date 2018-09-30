@@ -5,6 +5,9 @@ window.addEventListener('load', () => {
     let LISTS;
     let CURRENTLISTID;
     let FOCUSSEDINPUTFIELDID;
+
+    let TOKEN = AUTH_TOKEN;
+    let UPDATEOPTIONS = {method: 'POST', headers: {'Authorization': `Bearer ${TOKEN}`}};
     
     /* Load / setup storage */
     if (!storage.getItem('state')) {
@@ -12,7 +15,8 @@ window.addEventListener('load', () => {
         templates: [...DEFAULT_TEMPLATES],
         lists: [],
         currentListId: null,
-        focussedInputFieldId: null
+        focussedInputFieldId: null,
+        latestSeenUpdate: 0
       }));
     }    
     
@@ -22,7 +26,56 @@ window.addEventListener('load', () => {
       LISTS = state.lists;
       CURRENTLISTID = state.currentListId;
       FOCUSSEDINPUTFIELDID = state.focussedInputFieldId;
+      state.latestSeenUpdate = state.latestSeenUpdate || 0;
     }
+    
+    const handleUpdate = (update) => {
+      let cmd = update.upd;
+      switch(cmd.action) {
+      case 'make-new-template': 
+        {
+          if (TEMPLATES.find((t) => { return t.id == cmd.params.id; })) {
+            console.log(`Template ${cmd.params.id}`)
+          } else {
+            let t = { 
+              id: cmd.params.id, title: cmd.params.title };
+            TEMPLATES.push(t);
+            storage.setItem('state', JSON.stringify(state));
+          }
+        }
+        return true;
+      case 'commit-template-title':
+        {
+          let t = TEMPLATES.find((t) => { return t.id === cmd.params.id; } );
+          t.title = cmd.params.title;
+          storage.setItem('state', JSON.stringify(state));
+        }
+        return true;
+      default:
+        return false;
+      }
+    }
+    
+    const backgroundUpdate = () => {
+      fetch(`/api/v1/updates?since=${state.latestSeenUpdate}`,
+       {method: 'GET', headers: {'Authorization': `Bearer ${TOKEN}`}})
+      .then(response => {
+        if(response.ok) {
+          response.json().then(updates => {
+            updates.forEach(update => {
+              if (handleUpdate(update)) {
+                state.latestSeenUpdate = update.id;
+                storage.setItem('state', JSON.stringify(state));
+              }
+            });
+            if (updates.length > 0) render();
+          });
+        }
+      })
+      .catch(e => console.error(e));
+      setTimeout(backgroundUpdate, 5000);
+    }
+    backgroundUpdate();
         
     const render = () => {
       /* Show templates header */
@@ -159,8 +212,11 @@ window.addEventListener('load', () => {
       if (makeNewTemplate) {
         makeNewTemplate.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let t = { id: `t_${TEMPLATES.length + 1}`, title: Math.random().toString(36).substr(2,5), items: [], expanded: false };
+          let t = { id: `t_${Math.random().toString(36).substr(2)}`, title: "Neue Vorlage", items: [], expanded: false };
           TEMPLATES.push(t);
+          
+          fetch('/api/v1/update', Object.assign({body: JSON.stringify({action: 'make-new-template', params: {id: t.id, title: t.title}})}, UPDATEOPTIONS)).then(r => console.log(r)).catch(e => console.error(e));
+          
           render();
         });
       }
@@ -184,6 +240,9 @@ window.addEventListener('load', () => {
           template.title = document.getElementById(`input-template-title-${template.id}`).value;
           template.editing = false;
           storage.setItem('state', JSON.stringify(state));
+          
+          fetch('/api/v1/update', Object.assign({body: JSON.stringify({action: 'commit-template-title', params: {id: template.id, title: template.title}})}, UPDATEOPTIONS)).then(r => console.log(r)).catch(e => console.error(e));
+          
           render();
         });
       });
@@ -199,6 +258,8 @@ window.addEventListener('load', () => {
                 template.title = document.getElementById(`input-template-title-${template.id}`).value;
                 template.editing = false;
                 storage.setItem('state', JSON.stringify(state));
+
+                fetch('/api/v1/update', Object.assign({body: JSON.stringify({action: 'commit-template-title', params: {id: template.id, title: template.title}})}, UPDATEOPTIONS)).then(r => console.log(r)).catch(e => console.error(e));
               }
               render();
               break;
@@ -534,6 +595,7 @@ window.addEventListener('load', () => {
     };
     
     render();
+    
   };
   
   init();
