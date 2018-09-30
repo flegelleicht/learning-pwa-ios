@@ -7,24 +7,34 @@ require 'sinatra/base'
 require 'jwt'
 require 'json'
 require 'pp'
+require 'cgi'
 
 class Application < Sinatra::Base
+  
   class JwtAuth
     def initialize app
       @app = app
     end
 
+    def decodeBearerInEnv(bearer, env)
+      options = { algorithm: 'HS256', iss: ENV['MEHRMALIST_JWT_ISSUER'] }
+      payload, header = JWT.decode bearer, ENV['MEHRMALIST_JWT_SECRET'], true, options
+      env[:scopes] = payload['scopes']
+      env[:user] = payload['user']
+    end
+
     def call env
       begin
         if env.fetch('PATH_INFO', '') =~ /(^\/api\/v1)/
-          if env.fetch('PATH_INFO', '') !~ /\/login$/
-            options = { algorithm: 'HS256', iss: ENV['MEHRMALIST_JWT_ISSUER'] }
+          # Only handle api routes
+          if env.fetch('PATH_INFO', '') =~ /\/login$/
+            # Do nothing when trying to log in
+          elsif env.fetch('PATH_INFO', '') =~ /\/updatestream$/
+            bearer = CGI.parse(env.fetch('QUERY_STRING', ''))['token'][0]
+            decodeBearerInEnv(bearer, env)
+          else
             bearer = env.fetch('HTTP_AUTHORIZATION', '').slice(7..-1)
-            payload, header = JWT.decode bearer, ENV['MEHRMALIST_JWT_SECRET'], true, options
-            env[:scopes] = payload['scopes']
-            puts "#{payload['scopes']}"
-            env[:user] = payload['user']
-            puts "#{payload['user']}"
+            decodeBearerInEnv(bearer, env)
           end
         end
 
@@ -49,6 +59,7 @@ class Application < Sinatra::Base
       "#{ENV['MEHRMALIST_USER']}" => "#{ENV['MEHRMALIST_PASS']}"
     }
     @@updates = {}
+    @@connections = {};
   end
   
   configure do
@@ -77,7 +88,7 @@ class Application < Sinatra::Base
   
   def payload(username)
     {
-      exp: Time.now.to_i + 60 * 60,
+      exp: Time.now.to_i + 60 * 60 * 24,
       iat: Time.now.to_i,
       iss: ENV['MEHRMALIST_JWT_ISSUER'],
       scopes: ['get_state', 'add_change'],
@@ -107,6 +118,28 @@ class Application < Sinatra::Base
     pp request.env
     content_type 'text/javascript'
     {message: 'Here’s your state'}.to_json
+  end
+  
+  # FROM https://gist.github.com/rkh/1476463
+  get '/api/v1/updatestream', provides: 'text/event-stream' do
+    username = request.env[:user]['username'].to_sym
+    unless (@@connections[username])
+      @@connections[username] = []
+    end
+    stream :keep_open do |out|
+      @@connections[username] << out
+      out.callback { @@connections[username].delete(out) }
+      
+      updates = @@updates[username]
+      if updates
+        if params['since']
+          lastSeen = params['since'].to_i
+          updates.select {|u| u[:id] > lastSeen}.map do |u|
+            out << "data: #{u.to_json}\n\n"
+          end
+        end
+      end
+    end
   end
   
   get '/api/v1/updates' do
@@ -140,7 +173,9 @@ class Application < Sinatra::Base
     }
     @@updates[username] << update
     pp update
-    
+    @@connections[username].each {|out| 
+      # https://www.html5rocks.com/en/tutorials/eventsource/basics/#toc-event-stream-format
+      out << "data: #{update.to_json}\n\n" }
     content_type 'text/javascript'
     {message: 'Update successful'}.to_json
   end
