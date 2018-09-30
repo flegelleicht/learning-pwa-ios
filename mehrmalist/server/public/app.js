@@ -56,7 +56,7 @@ window.addEventListener('load', () => {
       }
     }
     
-    let updates = new EventSource(`/api/v1/updatestream?since=${state.latestSeenUpdate}&token=${TOKEN}`)
+    let updates = new EventSource(`api/v1/updatestream?since=${state.latestSeenUpdate}&token=${TOKEN}`)
     updates.onmessage = (e) => {
       update = JSON.parse(e.data);
       if (handleUpdate(update)) {
@@ -205,7 +205,7 @@ window.addEventListener('load', () => {
           let t = { id: `t_${Math.random().toString(36).substr(2)}`, title: "Neue Vorlage", items: [], expanded: false };
           TEMPLATES.push(t);
           
-          fetch('/api/v1/update', Object.assign({body: JSON.stringify({action: 'make-new-template', params: {id: t.id, title: t.title}})}, UPDATEOPTIONS)).then(r => console.log(r)).catch(e => console.error(e));
+          fetch('api/v1/update', Object.assign({body: JSON.stringify({action: 'make-new-template', params: {id: t.id, title: t.title}})}, UPDATEOPTIONS)).then(r => console.log(r)).catch(e => console.error(e));
           
           render();
         });
@@ -231,7 +231,7 @@ window.addEventListener('load', () => {
           template.editing = false;
           storage.setItem('state', JSON.stringify(state));
           
-          fetch('/api/v1/update', Object.assign({body: JSON.stringify({action: 'commit-template-title', params: {id: template.id, title: template.title}})}, UPDATEOPTIONS)).then(r => console.log(r)).catch(e => console.error(e));
+          fetch('api/v1/update', Object.assign({body: JSON.stringify({action: 'commit-template-title', params: {id: template.id, title: template.title}})}, UPDATEOPTIONS)).then(r => console.log(r)).catch(e => console.error(e));
           
           render();
         });
@@ -249,7 +249,7 @@ window.addEventListener('load', () => {
                 template.editing = false;
                 storage.setItem('state', JSON.stringify(state));
 
-                fetch('/api/v1/update', Object.assign({body: JSON.stringify({action: 'commit-template-title', params: {id: template.id, title: template.title}})}, UPDATEOPTIONS)).then(r => console.log(r)).catch(e => console.error(e));
+                fetch('api/v1/update', Object.assign({body: JSON.stringify({action: 'commit-template-title', params: {id: template.id, title: template.title}})}, UPDATEOPTIONS)).then(r => console.log(r)).catch(e => console.error(e));
               }
               render();
               break;
