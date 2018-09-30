@@ -38,7 +38,7 @@ window.addEventListener('load', () => {
             console.log(`Template ${cmd.params.id}`)
           } else {
             let t = { 
-              id: cmd.params.id, title: cmd.params.title };
+              id: cmd.params.id, title: cmd.params.title, items: [] };
             TEMPLATES.push(t);
             storage.setItem('state', JSON.stringify(state));
           }
@@ -56,26 +56,16 @@ window.addEventListener('load', () => {
       }
     }
     
-    const backgroundUpdate = () => {
-      fetch(`/api/v1/updates?since=${state.latestSeenUpdate}`,
-       {method: 'GET', headers: {'Authorization': `Bearer ${TOKEN}`}})
-      .then(response => {
-        if(response.ok) {
-          response.json().then(updates => {
-            updates.forEach(update => {
-              if (handleUpdate(update)) {
-                state.latestSeenUpdate = update.id;
-                storage.setItem('state', JSON.stringify(state));
-              }
-            });
-            if (updates.length > 0) render();
-          });
-        }
-      })
-      .catch(e => console.error(e));
-      setTimeout(backgroundUpdate, 5000);
+    let updates = new EventSource(`/api/v1/updatestream?since=${state.latestSeenUpdate}&token=${TOKEN}`)
+    updates.onmessage = (e) => {
+      update = JSON.parse(e.data);
+      if (handleUpdate(update)) {
+        state.latestSeenUpdate = update.id;
+        storage.setItem('state', JSON.stringify(state));
+        render();
+      }
     }
-    backgroundUpdate();
+    
         
     const render = () => {
       /* Show templates header */
