@@ -205,7 +205,15 @@ window.addEventListener('load', () => {
         };
       },
       commitListItemTitle: (params = {}) => {
-        
+        return {
+          sync: true,
+          action: 'commit-list-item-title',
+          params: {
+            lid: params.lid,
+            iid: params.iid,
+            title: params.title
+          }
+        };
       },
       cancelListItemTitle: (params = {}) => {
         
@@ -365,6 +373,14 @@ window.addEventListener('load', () => {
           let i = l.items.find((i) => { return i.id === cmd.params.iid });
           i.editing = true;
           state.focussedInputFieldId = FOCUSSEDINPUTFIELDID = `input-item-title-${l.id}-${i.id}`;
+        }
+        return true;
+      case 'commit-list-item-title':
+        {
+          let l = LISTS.find((l) => { return l.id === cmd.params.lid });
+          let i = l.items.find((i) => { return i.id === cmd.params.iid });
+          i.title = cmd.params.title;
+          i.editing = false;
         }
         return true;
       default:
@@ -938,12 +954,15 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('commit-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
-          let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
-          item.title = document.getElementById(`input-item-title-${list.id}-${item.id}`).value;
-          item.editing = false;
-          storage.setItem('state', JSON.stringify(state));
-          render();          
+          let lid = event.target.dataset.listid;
+          let iid = event.target.dataset.itemid
+          emit(
+            UPDATES.commitListItemTitle({
+              lid: lid,
+              iid: iid,
+              title: document.getElementById(`input-item-title-${lid}-${iid}`).value
+            })
+          );
         });
       });
 
