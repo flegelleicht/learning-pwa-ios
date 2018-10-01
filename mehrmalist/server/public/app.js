@@ -125,8 +125,16 @@ window.addEventListener('load', () => {
       },
       
       makeNewListFromTemplate: (params = {}) => {
-        
+        return {
+          sync: true,
+          action: 'make-new-list-from-template',
+          params: {
+            tid: params.tid,
+            lid: params.lid
+          }
+        }
       },
+
       makeNewList: (params = {}) => {
         
       },
@@ -238,6 +246,22 @@ window.addEventListener('load', () => {
           let t = TEMPLATES.find((t) => { return t.id === cmd.params.tid; } );
           let i = t.items.find((i) => { return i.id === cmd.params.iid; } );
           i.editing = false;
+        }
+        return true;
+      case 'make-new-list-from-template':
+        {
+          let t = TEMPLATES.find((t) => { return t.id === cmd.params.tid; } );
+          let l = {
+            id: cmd.params.lid,
+            title: t.title,
+            items: t.items.map((i) => { 
+              let r = {...i};
+              r.id = r.id.replace('ti_', 'li_');
+              return r;
+            })
+          };
+          LISTS.push(l);
+          state.currentListId = CURRENTLISTID = l.id;
         }
         return true;
       default:
@@ -645,16 +669,12 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('make-new-list-from-this')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
-          let newList = {};
-          newList.id = `l_${LISTS.length + 1}`;
-          newList.title = template.title;
-          newList.items = [...template.items];
-          
-          LISTS.push(newList);
-          state.currentListId = CURRENTLISTID = newList.id;
-          storage.setItem('state', JSON.stringify(state));
-          render();
+          emit(
+            UPDATES.makeNewListFromTemplate({
+              tid: event.target.dataset.templateid,
+              lid: `l_${Math.random().toString(36).substr(2)}`
+            })
+          );
         });
       });
       
