@@ -49,8 +49,8 @@ window.addEventListener('load', () => {
           sync: true,
           action: 'make-new-template', 
           params: {
-            id: params.id || `t_${Math.random().toString(36).substr(2)}`,
-            title: params.title || 'Neue Vorlage',
+            id: params.id,
+            title: params.title,
           }};
       },
       editTemplateTitle: (params = {}) => {
@@ -87,7 +87,9 @@ window.addEventListener('load', () => {
           sync: true,
           action: 'add-new-item-to-template',
           params: {
-            id: params.id
+            tid: params.tid,
+            iid: params.iid,
+            title: params.title
           }
         }
         
@@ -284,10 +286,10 @@ window.addEventListener('load', () => {
         return true;
       case 'add-new-item-to-template':
         {
-          let t = TEMPLATES.find((t) => { return t.id === cmd.params.id; } );
+          let t = TEMPLATES.find((t) => { return t.id === cmd.params.tid; } );
           let item = { 
-            id: `ti_${Math.random().toString(36).substr(2)}`, 
-            title: 'Neuer Eintrag', 
+            id: cmd.params.iid, //`ti_${Math.random().toString(36).substr(2)}`, 
+            title: cmd.params.title, //'Neuer Eintrag', 
             editing: true 
           };
           t.items.push(item);
@@ -656,7 +658,10 @@ window.addEventListener('load', () => {
       if (makeNewTemplate) {
         makeNewTemplate.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          emit(UPDATES.makeNewTemplate());
+          emit(UPDATES.makeNewTemplate({
+            id: `t_${Math.random().toString(36).substr(2)}`,
+            title: 'Neue Vorlage'
+          }));
         });
       }
       
@@ -723,7 +728,11 @@ window.addEventListener('load', () => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
           emit(
-            UPDATES.makeNewTemplateItem({id: event.target.dataset.templateid})
+            UPDATES.makeNewTemplateItem({
+              tid: event.target.dataset.templateid,
+              iid: `ti_${Math.random().toString(36).substr(2)}`,
+              title: 'Neuer Eintrag'
+            })
           );
         });
       });
