@@ -349,7 +349,7 @@ window.addEventListener('load', () => {
             title: cmd.params.title,
             editing: cmd.params.editing
           }
-          l.push(i);
+          l.items.push(i);
         }
         return true;
       default:
@@ -872,11 +872,14 @@ window.addEventListener('load', () => {
             case 13 /* Enter */: 
               event.preventDefault(); event.stopPropagation();
               { 
-                let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
-                let text = event.target.value;
-                let item = { id: `li_${list.items.length + 1}`, title: text, editing: false };
-                list.items.push(item);
-                storage.setItem('state', JSON.stringify(state));
+                emit(
+                  UPDATES.makeNewListItem({
+                    lid: event.target.dataset.listid,
+                    iid: `li_${Math.random().toString(36).substr(2)}`,
+                    title: event.target.value,
+                    editing: false
+                  })
+                );
               }
               render();
               break;
