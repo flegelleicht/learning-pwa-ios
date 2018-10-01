@@ -977,7 +977,7 @@ window.addEventListener('load', () => {
           emit(
             UPDATES.toggleListItemCompletion({
               lid: CURRENTLISTID,
-              iid: event.target.dataset.itemid
+              iid: event.target.id
             })
           );
         })
