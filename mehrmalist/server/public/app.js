@@ -136,10 +136,23 @@ window.addEventListener('load', () => {
       },
 
       makeNewList: (params = {}) => {
-        
+        return {
+          sync: true,
+          action: 'make-new-list',
+          params: {
+            lid: params.lid
+          }
+        };
       },
+
       editListTitle: (params = {}) => {
-        
+        return {
+          sync: false,
+          action: 'edit-list-title',
+          params: {
+            lid: params.lid
+          }
+        };
       },
       commitListTitle: (params = {}) => {
         
@@ -262,6 +275,25 @@ window.addEventListener('load', () => {
           };
           LISTS.push(l);
           state.currentListId = CURRENTLISTID = l.id;
+        }
+        return true;
+      case 'make-new-list':
+        {
+          let l = {
+            id: cmd.params.lid,
+            title: 'Neue Liste',
+            items: [],
+            editing: true
+          };
+          LISTS.push(l);
+          state.currentListId = CURRENTLISTID = l.id;
+        }
+        return true;
+      case 'edit-list-title':
+        {
+          let l = LISTS.find((l) => { return l.id === cmd.params.lid; })
+          l.editing = true;
+          state.focussedInputFieldId = FOCUSSEDINPUTFIELDID = l.id;
         }
         return true;
       default:
@@ -683,12 +715,9 @@ window.addEventListener('load', () => {
       if (makeNewList) {
         makeNewList.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let l = { id: `l_${LISTS.length + 1}`, title: 'Neue Liste', items: [], editing: true };
-          // FOCUSSEDINPUTFIELDID =
-          LISTS.push(l);
-          state.currentListId = CURRENTLISTID = l.id;
-          storage.setItem('state', JSON.stringify(state));
-          render();
+          emit(
+            UPDATES.makeNewList({lid: `l_${Math.random().toString(36).substr(2)}`})
+          );
         });
       }
       
@@ -696,13 +725,11 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('edit-list-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid; });
-          list.editing = true;
-          FOCUSSEDINPUTFIELDID = `input-list-title-${list.id}`;
-          render();
+          emit(
+            UPDATES.editListTitle({lid: event.target.dataset.listid})
+          );
         });
       });
-      
       
       /* Commit list title*/
       Array.from(document.getElementsByClassName('commit-list-title')).map((el) => {
