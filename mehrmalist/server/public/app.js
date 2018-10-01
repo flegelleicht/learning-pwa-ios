@@ -195,7 +195,14 @@ window.addEventListener('load', () => {
         };
       },
       editListItemTitle: (params = {}) => {
-        
+        return {
+          sync: false,
+          action: 'edit-list-item-title',
+          params: {
+            lid: params.lid,
+            iid: params.iid
+          }
+        };
       },
       commitListItemTitle: (params = {}) => {
         
@@ -350,6 +357,14 @@ window.addEventListener('load', () => {
             editing: cmd.params.editing
           }
           l.items.push(i);
+        }
+        return true;
+      case 'edit-list-item-title':
+        {
+          let l = LISTS.find((l) => { return l.id === cmd.params.lid });
+          let i = l.items.find((i) => { return i.id === cmd.params.iid });
+          i.editing = true;
+          state.focussedInputFieldId = FOCUSSEDINPUTFIELDID = `input-item-title-${l.id}-${i.id}`;
         }
         return true;
       default:
@@ -910,11 +925,12 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('edit-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
-          let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
-          item.editing = true;
-          FOCUSSEDINPUTFIELDID = `input-item-title-${list.id}-${item.id}`;
-          render();
+          emit(
+            UPDATES.editListItemTitle({
+              lid: event.target.dataset.listid,
+              iid: event.target.dataset.itemid
+            })
+          );
         });
       });
 
