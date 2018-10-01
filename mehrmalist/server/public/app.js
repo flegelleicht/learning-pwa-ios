@@ -252,6 +252,7 @@ window.addEventListener('load', () => {
     
     const handleUpdate = (update) => {
       let cmd = update.upd;
+      if (update.fromRemote) cmd = JSON.parse(update.upd);
       switch(cmd.action) {
       case 'make-new-template': 
         {
@@ -424,6 +425,7 @@ window.addEventListener('load', () => {
       updates = new EventSource(`api/v1/updatestream?since=${state.latestSeenUpdate}&token=${TOKEN}`);
       updates.onmessage = (e) => {
         update = JSON.parse(e.data);
+        update.fromRemote = true; // Tag update as remote
         if (update.id > state.latestSeenUpdate) { // FIXME!
           if (handleUpdate(update)) {
             state.latestSeenUpdate = update.id;
@@ -431,12 +433,18 @@ window.addEventListener('load', () => {
             render();
           }
         }
+      };
+      updates.onerror = (e) => {
+        updates.close();
+        setTimeout(startUpdates, 1000);
       }
       
       // updates.onClose() => set up with current latestSeenUpdate FIXME!
       
     }
-    startUpdates();
+    if (state.status === 'logged-in') {
+      startUpdates();
+    }
     
     
     let ELEMENT = document.getElementById('mehrmalist');
@@ -580,13 +588,13 @@ window.addEventListener('load', () => {
       const formatItemForList = (item, list) => {
         return `
         <li class="listitem bordered ${item.done ? 'done' : ''} ${item.editing ? 'editing' : ''}" 
-            id="${item.id}">
+            id="${item.id}" data-itemid="${item.id}">
           ${item.editing ? 
             `<input type="text" value="${item.title}" class="input-item-title" id="input-item-title-${list.id}-${item.id}" data-listid="${list.id}" data-itemid="${item.id}" ${FOCUSSEDINPUTFIELDID === `input-item-title-${list.id}-${item.id}` ? 'autofocus' : ''}  onclick="event.stopPropagation();">
               <a href='#' class="commit-item-title" data-listid="${list.id}" data-itemid="${item.id}">✓</a>
               <a href='#' class="cancel-item-title" data-listid="${list.id}" data-itemid="${item.id}">𐄂</a>` 
             :
-            `<span class="listitem-title" id="listitem-title-${item.id}">${item.title}
+            `<span class="listitem-title" id="listitem-title-${item.id}" data-itemid="${item.id}">${item.title}
              ${item.done ? '' : `<a href='#' class="edit-item-title" data-itemid=${item.id} data-listid="${list.id}">✍︎</a>`}</span>`
           }
           
@@ -969,7 +977,7 @@ window.addEventListener('load', () => {
           emit(
             UPDATES.toggleListItemCompletion({
               lid: CURRENTLISTID,
-              iid: event.target.id
+              iid: event.target.dataset.itemid
             })
           );
         })
