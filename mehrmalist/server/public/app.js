@@ -588,7 +588,7 @@ window.addEventListener('load', () => {
       const formatItemForList = (item, list) => {
         return `
         <li class="listitem bordered ${item.done ? 'done' : ''} ${item.editing ? 'editing' : ''}" 
-            id="${item.id}">
+            id="${item.id}" data-itemid="${item.id}">
           ${item.editing ? 
             `<input type="text" value="${item.title}" class="input-item-title" id="input-item-title-${list.id}-${item.id}" data-listid="${list.id}" data-itemid="${item.id}" ${FOCUSSEDINPUTFIELDID === `input-item-title-${list.id}-${item.id}` ? 'autofocus' : ''}  onclick="event.stopPropagation();">
               <a href='#' class="commit-item-title" data-listid="${list.id}" data-itemid="${item.id}">✓</a>
@@ -977,7 +977,7 @@ window.addEventListener('load', () => {
           emit(
             UPDATES.toggleListItemCompletion({
               lid: CURRENTLISTID,
-              iid: event.target.id
+              iid: event.target.dataset.itemid
             })
           );
         })
