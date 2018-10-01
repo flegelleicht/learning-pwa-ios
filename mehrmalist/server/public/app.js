@@ -103,7 +103,15 @@ window.addEventListener('load', () => {
         }
       },
       commitTemplateItemTitle: (params = {}) => {
-        
+        return {
+          sync: true,
+          action: 'commit-template-item-title',
+          params: {
+            tid: params.tid,
+            iid: params.iid,
+            title: params.title
+          }
+        }
       },
       cancelTemplateItemTitle: (params = {}) => {
         
@@ -208,6 +216,14 @@ window.addEventListener('load', () => {
           let i = t.items.find((i) => { return i.id === cmd.params.iid; } );
           i.editing = true;
           state.focussedInputFieldId = FOCUSSEDINPUTFIELDID = `input-template-item-title-${t.id}-${i.id}`;
+        }
+        return true;
+      case 'commit-template-item-title':
+        {
+          let t = TEMPLATES.find((t) => { return t.id === cmd.params.tid; } );
+          let i = t.items.find((i) => { return i.id === cmd.params.iid; } );
+          i.title = cmd.params.title;
+          i.editing = false;
         }
         return true;
       default:
@@ -544,12 +560,15 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('commit-template-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid });
-          let item = template.items.find((i) => { return i.id === event.target.dataset.itemid });
-          item.title = document.getElementById(`input-template-item-title-${template.id}-${item.id}`).value;
-          item.editing = false;
-          storage.setItem('state', JSON.stringify(state));
-          render();          
+          let tid = event.target.dataset.templateid;
+          let iid = event.target.dataset.itemid;
+          emit(
+            UPDATES.commitTemplateItemTitle({
+              tid: tid,
+              iid: iid,
+              title: document.getElementById(`input-template-item-title-${tid}-${iid}`).value
+            })
+          );
         });
       });
 
@@ -571,11 +590,15 @@ window.addEventListener('load', () => {
             case 13 /* Enter */: 
               event.preventDefault(); event.stopPropagation();
               { 
-                let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid });
-                let item = template.items.find((i) => { return i.id === event.target.dataset.itemid });
-                item.title = document.getElementById(`input-template-item-title-${template.id}-${item.id}`).value;
-                item.editing = false;
-                storage.setItem('state', JSON.stringify(state));
+                let tid = event.target.dataset.templateid;
+                let iid = event.target.dataset.itemid;
+                emit(
+                  UPDATES.commitTemplateItemTitle({
+                    tid: tid,
+                    iid: iid,
+                    title: document.getElementById(`input-template-item-title-${tid}-${iid}`).value
+                  })
+                );
               }
               if (event.shiftKey) {
                 console.log("SHIFT!");
