@@ -184,8 +184,8 @@ class Application < Sinatra::Base
     super do |server|
       server.ssl = true
       server.ssl_options = {
-        :cert_chain_file  => File.dirname(__FILE__) + "/../template/server.crt",
-        :private_key_file => File.dirname(__FILE__) + "/../template/server.key",
+        :cert_chain_file  => File.dirname(__FILE__) + "/../../template/server.crt",
+        :private_key_file => File.dirname(__FILE__) + "/../../template/server.key",
         :verify_peer      => false
       }
     end
