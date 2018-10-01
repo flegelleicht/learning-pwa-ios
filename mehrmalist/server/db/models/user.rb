@@ -2,6 +2,8 @@ require 'bcrypt'
 require 'securerandom'
 
 class User < Sequel::Model
+  one_to_many :updates
+  
   def before_create
     self.created = Time.now
     self.modified = self.created
