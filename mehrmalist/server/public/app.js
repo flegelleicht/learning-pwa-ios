@@ -183,7 +183,16 @@ window.addEventListener('load', () => {
       },
       
       makeNewListItem: (params = {}) => {
-        
+        return {
+          sync: true,
+          action: 'add-new-item-to-list',
+          params: {
+            lid: params.lid,
+            iid: params.iid,
+            title: params.title,
+            editing: params.editing
+          }
+        };
       },
       editListItemTitle: (params = {}) => {
         
@@ -330,6 +339,17 @@ window.addEventListener('load', () => {
       case 'select-list':
         {
           state.currentListId = CURRENTLISTID = cmd.params.lid;
+        }
+        return true;
+      case 'add-new-item-to-list':
+        {
+          let l = LISTS.find((l) => { return l.id === cmd.params.lid });
+          let i = {
+            id: cmd.params.iid,
+            title: cmd.params.title,
+            editing: cmd.params.editing
+          }
+          l.push(i);
         }
         return true;
       default:
@@ -834,12 +854,14 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('add-item-to-list')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });          
-          let item = { id: `li_${list.items.length + 1}`, title: "Neuer Eintrag", editing: true };
-          list.items.push(item);
-          
-          storage.setItem('state', JSON.stringify(state));
-          render();
+          emit(
+            UPDATES.makeNewListItem({
+              lid: event.target.dataset.listid,
+              iid: `li_${Math.random().toString(36).substr(2)}`,
+              title: 'Neuer Eintrag',
+              editing: true
+            })
+          );
         });
       });
       
