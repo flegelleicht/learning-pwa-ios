@@ -83,10 +83,17 @@ window.addEventListener('load', () => {
       },
       
       makeNewTemplateItem: (params = {}) => {
+        return {
+          sync: true,
+          action: 'add-new-item-to-template',
+          params: {
+            id: params.id
+          }
+        }
         
       },
       editTemplateItemTitle: (params = {}) => {
-        
+
       },
       commitTemplateItemTitle: (params = {}) => {
         
@@ -176,6 +183,18 @@ window.addEventListener('load', () => {
           t.editing = false;
         }
         return true;
+      case 'add-new-item-to-template':
+        {
+          let t = TEMPLATES.find((t) => { return t.id === cmd.params.id; } );
+          let item = { 
+            id: `ti_${Math.random().toString(36).substr(2)}`, 
+            title: 'Neuer Eintrag', 
+            editing: true 
+          };
+          t.items.push(item);
+          state.focussedInputFieldId = FOCUSSEDINPUTFIELDID = `input-template-item-title-${t.id}-${item.id}`;
+        }
+        return true
       default:
         return false;
       }
@@ -183,16 +202,21 @@ window.addEventListener('load', () => {
     
     let updates;
     const startUpdates = () => {
-      if (updates && updates.readyState === 1) { return; }
+      //if (updates && updates.readyState === 1) { return; } FIXME!
       updates = new EventSource(`api/v1/updatestream?since=${state.latestSeenUpdate}&token=${TOKEN}`);
       updates.onmessage = (e) => {
         update = JSON.parse(e.data);
-        if (handleUpdate(update)) {
-          state.latestSeenUpdate = update.id;
-          save();
-          render();
+        if (update.id > state.latestSeenUpdate) { // FIXME!
+          if (handleUpdate(update)) {
+            state.latestSeenUpdate = update.id;
+            save();
+            render();
+          }
         }
       }
+      
+      // updates.onClose() => set up with current latestSeenUpdate FIXME!
+      
     }
     startUpdates();
     
@@ -285,7 +309,8 @@ window.addEventListener('load', () => {
                         <a href='#' class="make-new-list-from-this" data-templateid="${t.id}">❏</a>
 
                         ${t.expanded ? `<ul>
-                          ${t.items.reduce((acc, item) => {return acc + `<li>${item.title}</li>`}, '')}
+                          ${t.items.reduce((acc, item) => {return acc + 
+                            formatItemForTemplate(item, t)}, '')}
                           <li><a href='#' class="add-item-to-template" data-templateid="${t.id}">⊕</a></li>
                           </ul>` : ''} 
                     </li>`;
@@ -481,14 +506,9 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('add-item-to-template')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          
-          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
-          
-          let item = { id: `ti_${template.items.length + 1}`, title: 'Neuer Template-Eintrag', editing: true };
-          FOCUSSEDINPUTFIELDID = `input-template-item-title-${template.id}-${item.id}`;
-          template.items.push(item);
-          
-          render();
+          emit(
+            UPDATES.makeNewTemplateItem({id: event.target.dataset.templateid})
+          );
         });
       });
       
