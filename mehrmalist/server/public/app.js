@@ -124,9 +124,9 @@ window.addEventListener('load', () => {
       LISTS = state.lists;
       CURRENTLISTID = state.currentListId;
       FOCUSSEDINPUTFIELDID = state.focussedInputFieldId;
+      TOKEN = state.authToken;
       state.latestSeenUpdate = state.latestSeenUpdate || 0;
       state.status = state.status || 'logged-out';
-
     }
     
     const handleUpdate = (update) => {
