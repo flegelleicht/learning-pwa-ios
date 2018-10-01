@@ -93,7 +93,14 @@ window.addEventListener('load', () => {
         
       },
       editTemplateItemTitle: (params = {}) => {
-
+        return {
+          sync: true,
+          action: 'edit-template-item-title',
+          params: {
+            tid: params.tid, 
+            iid: params.iid
+          }
+        }
       },
       commitTemplateItemTitle: (params = {}) => {
         
@@ -194,7 +201,15 @@ window.addEventListener('load', () => {
           t.items.push(item);
           state.focussedInputFieldId = FOCUSSEDINPUTFIELDID = `input-template-item-title-${t.id}-${item.id}`;
         }
-        return true
+        return true;
+      case 'edit-template-item-title':
+        {
+          let t = TEMPLATES.find((t) => { return t.id === cmd.params.tid; } );
+          let i = t.items.find((i) => { return i.id === cmd.params.iid; } );
+          i.editing = true;
+          state.focussedInputFieldId = FOCUSSEDINPUTFIELDID = `input-template-item-title-${t.id}-${i.id}`;
+        }
+        return true;
       default:
         return false;
       }
@@ -516,11 +531,12 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('edit-template-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid });
-          let item = template.items.find((i) => { return i.id === event.target.dataset.itemid });
-          item.editing = true;
-          FOCUSSEDINPUTFIELDID = `input-template-item-title-${template.id}-${item.id}`;
-          render();
+          emit(
+            UPDATES.editTemplateItemTitle({
+              tid: event.target.dataset.templateid,
+              iid: event.target.dataset.itemid
+            })
+          );
         });
       });
 
