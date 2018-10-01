@@ -73,7 +73,13 @@ window.addEventListener('load', () => {
         };
       },
       cancelTemplateTitle: (params = {}) => {
-        
+        return {
+          sync: false,
+          action: 'cancel-template-title',
+          params: {
+            id: params.id
+          }
+        }
       },
       
       makeNewTemplateItem: (params = {}) => {
@@ -161,6 +167,12 @@ window.addEventListener('load', () => {
         {
           let t = TEMPLATES.find((t) => { return t.id === cmd.params.id; } );
           t.title = cmd.params.title;
+          t.editing = false;
+        }
+        return true;
+      case 'cancel-template-title':
+        {
+          let t = TEMPLATES.find((t) => { return t.id === cmd.params.id; } );
           t.editing = false;
         }
         return true;
@@ -431,10 +443,11 @@ window.addEventListener('load', () => {
       /* Commit/cancel template title with enter/escape */
       Array.from(document.getElementsByClassName('input-template-title')).map((el) => {
         el.addEventListener('keyup', (event) => {
+          let id = event.target.dataset.templateid;
+          
           switch (event.keyCode) {
             case 13 /* Enter */: 
               event.preventDefault(); event.stopPropagation();
-              let id = event.target.dataset.templateid;
               emit(
                 UPDATES.commitTemplateTitle({
                   id: id,
@@ -443,11 +456,11 @@ window.addEventListener('load', () => {
               break;
             case 27 /* Escape */: 
               event.preventDefault(); event.stopPropagation();
-              {
-                let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
-                template.editing = false;
-              }
-              render();
+              emit(
+                UPDATES.cancelTemplateTitle({
+                  id: id,
+                  title: document.getElementById(`input-template-title-${id}`).value
+                }));
               break;
             default: break;
           }
@@ -458,9 +471,9 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('cancel-template-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
-          template.editing = false;
-          render();
+          emit(
+            UPDATES.cancelTemplateTitle({id: event.target.dataset.templateid })
+          );
         });
       });
       
