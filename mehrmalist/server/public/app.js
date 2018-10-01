@@ -20,6 +20,30 @@ window.addEventListener('load', () => {
       }));
     }    
     
+    const emit = (update) => {
+      
+      // if online
+      fetch(
+        'api/v1/update',
+        Object.assign(
+          { body: JSON.stringify(update) },
+          UPDATEOPTIONS()
+        )
+      ).then(r => console.log(r)).catch(e => console.error(e));
+            
+    };
+    
+    const UPDATES = {
+      makeNewTemplate: (params = {}) => {
+        return { 
+          action: 'make-new-template', 
+          params: {
+            id: params.id || `t_${Math.random().toString(36).substr(2)}`,
+            title: params.title || 'Neue Vorlage',
+          }};
+      },
+    }
+    
     state = JSON.parse(storage.getItem('state'));
     if (state) {
       TEMPLATES = state.templates;
@@ -289,12 +313,7 @@ window.addEventListener('load', () => {
       if (makeNewTemplate) {
         makeNewTemplate.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let t = { id: `t_${Math.random().toString(36).substr(2)}`, title: "Neue Vorlage", items: [], expanded: false };
-          TEMPLATES.push(t);
-          
-          fetch('api/v1/update', Object.assign({body: JSON.stringify({action: 'make-new-template', params: {id: t.id, title: t.title}})}, UPDATEOPTIONS())).then(r => console.log(r)).catch(e => console.error(e));
-          
-          render();
+          emit(UPDATES.makeNewTemplate());
         });
       }
       
