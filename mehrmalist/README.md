@@ -32,7 +32,7 @@ Uses `localStorage` to save your lists and items.
 - [x] Change a template
 - [ ] Delete a template
 - [x] Add an item to a template
-- [ ] Save templates to `localStorage`
+- [x] Save templates to `localStorage`
 - [x] Create a list from a template
 - [x] Add a list without template
 - [x] Change a list
@@ -43,15 +43,15 @@ Uses `localStorage` to save your lists and items.
 - [x] Change an item in a list
 - [x] Mark an item as done
 - [ ] Delete an item
-- [ ] Commit editing on enter (⏎)
-- [ ] Cancel editing on esc (⎋)
+- [x] Commit editing on enter (⏎)
+- [x] Cancel editing on esc (⎋)
 - [ ] Continue entering items on shift+enter (⇧+⏎)
 - [ ] Add result to an item after completing (ah, and don't hide what you have done)
-- [ ] Sync state with a backend
+- [x] Sync state with a backend
 - [x] Put completed items at the end of the list
 - [ ] Sort items manually
 
 ### Implementation
 
-- [ ] Collect all update actions in a single place
+- [x] Collect all update actions in a single place
 - [ ] Replace dumb “render everything” method with React or Vue
