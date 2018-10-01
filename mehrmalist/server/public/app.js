@@ -20,28 +20,102 @@ window.addEventListener('load', () => {
       }));
     }    
     
+    const save = () => {
+      storage.setItem('state', JSON.stringify(state));
+    }
+    
     const emit = (update) => {
       
-      // if online
-      fetch(
-        'api/v1/update',
-        Object.assign(
-          { body: JSON.stringify(update) },
-          UPDATEOPTIONS()
-        )
-      ).then(r => console.log(r)).catch(e => console.error(e));
-            
+      if (update.sync) {
+        // ... and if online
+        fetch(
+          'api/v1/update',
+          Object.assign(
+            { body: JSON.stringify(update) },
+            UPDATEOPTIONS()
+          )
+        ).then(r => console.log(r)).catch(e => console.error(e));
+      } else {
+        if (handleUpdate({upd: update})) {
+          save();
+          render();
+        }
+      }
     };
     
     const UPDATES = {
       makeNewTemplate: (params = {}) => {
         return { 
+          sync: true,
           action: 'make-new-template', 
           params: {
             id: params.id || `t_${Math.random().toString(36).substr(2)}`,
             title: params.title || 'Neue Vorlage',
           }};
       },
+      editTemplateTitle: (params = {}) => {
+        return {
+          sync: false,
+          action: 'edit-template-title',
+          params: {
+            id: params.id
+          }
+        }
+      },
+      commitTemplateTitle: (params = {}) => {
+        
+      },
+      cancelTemplateTitle: (params = {}) => {
+        
+      },
+      
+      makeNewTemplateItem: (params = {}) => {
+        
+      },
+      editTemplateItemTitle: (params = {}) => {
+        
+      },
+      commitTemplateItemTitle: (params = {}) => {
+        
+      },
+      cancelTemplateItemTitle: (params = {}) => {
+        
+      },
+      
+      makeNewListFromTemplate: (params = {}) => {
+        
+      },
+      makeNewList: (params = {}) => {
+        
+      },
+      editListTitle: (params = {}) => {
+        
+      },
+      commitListTitle: (params = {}) => {
+        
+      },
+      cancelListTitle: (params = {}) => {
+        
+      },
+      selectList: (params = {}) => {
+        
+      },
+      
+      makeNewListItem: (params = {}) => {
+        
+      },
+      editListItemTitle: (params = {}) => {
+        
+      },
+      commitListItemTitle: (params = {}) => {
+        
+      },
+      cancelListItemTitle: (params = {}) => {
+        
+      },
+      toggleListItemCompletion: (params = {}) => {
+        
+      }
     }
     
     state = JSON.parse(storage.getItem('state'));
@@ -68,6 +142,13 @@ window.addEventListener('load', () => {
             TEMPLATES.push(t);
             storage.setItem('state', JSON.stringify(state));
           }
+        }
+        return true;
+      case 'edit-template-title': 
+        {
+          let t = TEMPLATES.find((t) => { return t.id == cmd.params.id });
+          t.editing = true;
+          state.focussedInputFieldId = FOCUSSEDINPUTFIELDID = `input-template-title-${t.id}`;
         }
         return true;
       case 'commit-template-title':
@@ -321,10 +402,7 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('edit-template-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
-          template.editing = true;
-          FOCUSSEDINPUTFIELDID = `input-template-title-${template.id}`;
-          render();
+          emit(UPDATES.editTemplateTitle({id: event.target.dataset.templateid}));
         });
       });
 
