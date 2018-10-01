@@ -71,27 +71,21 @@ window.addEventListener('load', () => {
       }
     }
     
-        
+    let ELEMENT = document.getElementById('mehrmalist');
     const render = () => {
+      ELEMENT.innerHTML = '';
+      
       if (state.status === 'logged-out') {
-        
-        document.getElementById('content').innerHTML = `
-          <div id="template-header"></div>
-          <ul id="template-list"></ul>
-          <div id="lists-header"></div>
-          <ul id="list-list"></ul>
-          <h1 id="list-header"></h1>
-          <ul id="list-items"></ul>
-        `;
-        let logout = document.getElementById('logout').style.display = 'none';
-        let login = document.getElementById('login');
-        login.style.display = 'block';
-        login.innerHTML = `
+        // Show only the login elements
+        let html = `
           <form id="login-form">
             <input type="text" id="login-user" value="" placeholder="Nutzer">
             <input type="password" id="login-pass" value="" placeholder="Passwort">
             <input type="submit" value="Senden">
           </form>`;
+        ELEMENT.innerHTML = html;
+        
+        // Set up listeners
         
         let loginForm = document.getElementById('login-form');
         loginForm.addEventListener('submit', (event) => {
@@ -116,27 +110,20 @@ window.addEventListener('load', () => {
           })
           .catch(error => console.error(error));
         });
-        return;
+        return; /* EARLY RETURN !
+        ^^^^^^   **********************/
+        
       }
 
-      document.getElementById('login').style.display = 'none';
-      let logout = document.getElementById('logout');
-      logout.style.display = 'block';
-      logout.innerHTML = `<button id="logout-button">Ausloggen</button>`;
-      document.getElementById('logout-button').addEventListener('click', (event) => {
-        state.authToken = '';
-        state.status = 'logged-out';
-        if (updates) updates.close();
-        storage.setItem('state', JSON.stringify(state));
-        render();
-      });
+      const LogoutButton = `
+        <button id="logout-button">Ausloggen</button>
+      `;
       
       /* Show templates header */
-      const templateHeaderContent = `
-      <h1>Vorlagen 
+      const TemplateHeaderContent = `
+      <div id="template-header"><h1>Vorlagen 
         <a href="#" id="make-new-template">⊕</a>
-      </h1>`;
-      document.getElementById('template-header').innerHTML = templateHeaderContent;
+      </h1></div>`;
             
       const formatItemForTemplate = (item, template) => {
         return `
@@ -178,15 +165,19 @@ window.addEventListener('load', () => {
                     </li>`;
                     return acc + html; 
       }, "");
-      document.getElementById('template-list').innerHTML = templateContent;
-    
-      const listHeaderContent = `
-        <h1>Listen
-          <a href="#" id="make-new-list">⊕</a>
-        </h1>
+      const TemplateList = `
+        <ul id="template-list">
+        ${templateContent}
+        </ul>
       `;
-      document.getElementById('lists-header').innerHTML = listHeaderContent;
-      
+    
+      const ListsHeaderContent = `
+        <div id="lists-header">
+          <h1>Listen
+            <a href="#" id="make-new-list">⊕</a>
+          </h1>
+        </div>
+      `;      
       
       /* Show Lists */
       let listContent = LISTS.reduce((acc, l) => { 
@@ -211,7 +202,11 @@ window.addEventListener('load', () => {
                     </li>`;
         return acc + html
       }, "");
-      document.getElementById('list-list').innerHTML = listContent;
+      const ListsList = `
+        <ul id="list-list">
+          ${listContent}
+        </ul>
+      `;
     
       const formatItemForList = (item, list) => {
         return `
@@ -230,10 +225,12 @@ window.addEventListener('load', () => {
       };
       
       /* Show current list */
+      let CurrentList = '';
       if (CURRENTLISTID) {
         let l = LISTS.find((l) => { return l.id === CURRENTLISTID; });
-        let currentListHeader = `Liste: ${l.title}`;
-        document.getElementById('list-header').innerHTML = currentListHeader;
+        CurrentList += `
+          <h1 id="list-header">Liste: ${l.title}</h1>
+        `;
         
         let todoListItems = l.items.filter(item => !item.done);
         let completedListItems = l.items.filter(item => item.done);
@@ -243,7 +240,34 @@ window.addEventListener('load', () => {
         html = html + `<li class="quickentry"><input type="text" class="quickentry-add-item-to-list" data-listid="${l.id}" placeholder="+ Eintrag" value=""></li>`;
         html = completedListItems.reduce((acc, item) => { return acc + formatItemForList(item, l); }, html);
         
-        document.getElementById('list-items').innerHTML = html;
+        CurrentList += `
+          <ul id="list-items">
+            ${html}
+          </ul>
+        `;
+      }
+      
+      const Content = `
+        ${LogoutButton}
+        ${TemplateHeaderContent}
+        ${TemplateList}
+        ${ListsHeaderContent}
+        ${ListsList}
+        ${CurrentList}
+      `;
+      
+      ELEMENT.innerHTML = Content;
+      
+      /* Log out */
+      let logoutButton = document.getElementById('logout-button');
+      if (logoutButton) {
+        logoutButton.addEventListener('click', (event) => {
+          state.authToken = '';
+          state.status = 'logged-out';
+          if (updates) updates.close();
+          storage.setItem('state', JSON.stringify(state));
+          render();
+        });
       }
             
       /* Toggle template list expansion by clicking on it */
@@ -522,9 +546,9 @@ window.addEventListener('load', () => {
       /* Make list current list by clicking on it */
       Array.from(document.getElementsByClassName('list')).map((el) => {
         el.addEventListener('click', (event) => {
-          let list = lists.find((l) => { return l.id === event.target.id });
-          currentListId = list.id;
-          storage.setItem('currentListId', currentListId);
+          let list = LISTS.find((l) => { return l.id === event.target.id });
+          state.currentListId = CURRENTLISTID = list.id;
+          storage.setItem('state', JSON.stringify(state));
           render();
         });
       });
