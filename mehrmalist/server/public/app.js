@@ -216,7 +216,14 @@ window.addEventListener('load', () => {
         };
       },
       cancelListItemTitle: (params = {}) => {
-        
+        return {
+          sync: false,
+          action: 'cancel-list-item-title',
+          params: {
+            lid: params.lid,
+            iid: params.iid
+          }
+        };
       },
       toggleListItemCompletion: (params = {}) => {
         
@@ -380,6 +387,13 @@ window.addEventListener('load', () => {
           let l = LISTS.find((l) => { return l.id === cmd.params.lid });
           let i = l.items.find((i) => { return i.id === cmd.params.iid });
           i.title = cmd.params.title;
+          i.editing = false;
+        }
+        return true;
+      case 'cancel-list-item-title':
+        {
+          let l = LISTS.find((l) => { return l.id === cmd.params.lid });
+          let i = l.items.find((i) => { return i.id === cmd.params.iid });
           i.editing = false;
         }
         return true;
@@ -552,7 +566,7 @@ window.addEventListener('load', () => {
         <li class="listitem bordered ${item.done ? 'done' : ''} ${item.editing ? 'editing' : ''}" 
             id="${item.id}">
           ${item.editing ? 
-            `<input type="text" value="${item.title}" class="input-item-title" id="input-item-title-${list.id}-${item.id}" data-listid="${list.id}" data-itemid="${item.id}" ${FOCUSSEDINPUTFIELDID === `input-item-title-${list.id}-${item.id}` ? 'autofocus' : ''}>
+            `<input type="text" value="${item.title}" class="input-item-title" id="input-item-title-${list.id}-${item.id}" data-listid="${list.id}" data-itemid="${item.id}" ${FOCUSSEDINPUTFIELDID === `input-item-title-${list.id}-${item.id}` ? 'autofocus' : ''}  onclick="event.stopPropagation();">
               <a href='#' class="commit-item-title" data-listid="${list.id}" data-itemid="${item.id}">✓</a>
               <a href='#' class="cancel-item-title" data-listid="${list.id}" data-itemid="${item.id}">𐄂</a>` 
             :
@@ -576,7 +590,7 @@ window.addEventListener('load', () => {
         
         html = '';
         html = todoListItems.reduce((acc, item) => { return acc + formatItemForList(item, l); }, html);
-        html = html + `<li class="quickentry"><input type="text" class="quickentry-add-item-to-list" data-listid="${l.id}" placeholder="+ Eintrag" value=""></li>`;
+        html = html + `<li class="quickentry"><input type="text" class="quickentry-add-item-to-list" data-listid="${l.id}" placeholder="+ Eintrag" value="""></li>`;
         html = completedListItems.reduce((acc, item) => { return acc + formatItemForList(item, l); }, html);
         
         CurrentList += `
@@ -970,10 +984,12 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('cancel-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
-          let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
-          item.editing = false;
-          render();
+          emit(
+            UPDATES.cancelListItemTitle({
+              lid: event.target.dataset.listid,
+              iid: event.target.dataset.itemid
+            })
+          );
         });
       });
       
