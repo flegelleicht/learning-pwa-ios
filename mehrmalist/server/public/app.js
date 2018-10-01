@@ -173,7 +173,13 @@ window.addEventListener('load', () => {
         };
       },
       selectList: (params = {}) => {
-        
+        return {
+          sync: false,
+          action: 'select-list',
+          params: {
+            lid: params.lid
+          }
+        };
       },
       
       makeNewListItem: (params = {}) => {
@@ -319,6 +325,11 @@ window.addEventListener('load', () => {
         {
           let l = LISTS.find((l) => { return l.id === cmd.params.lid; })
           l.editing = false;
+        }
+        return true;
+      case 'select-list':
+        {
+          state.currentListId = CURRENTLISTID = cmd.params.lid;
         }
         return true;
       default:
@@ -813,10 +824,9 @@ window.addEventListener('load', () => {
       /* Make list current list by clicking on it */
       Array.from(document.getElementsByClassName('list')).map((el) => {
         el.addEventListener('click', (event) => {
-          let list = LISTS.find((l) => { return l.id === event.target.id });
-          state.currentListId = CURRENTLISTID = list.id;
-          storage.setItem('state', JSON.stringify(state));
-          render();
+          emit(
+            UPDATES.selectList({lid: event.target.id})
+          );
         });
       });
       
