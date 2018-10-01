@@ -63,7 +63,14 @@ window.addEventListener('load', () => {
         }
       },
       commitTemplateTitle: (params = {}) => {
-        
+        return {
+          sync: true,
+          action: 'commit-template-title',
+          params: {
+            id: params.id,
+            title: params.title
+          }
+        };
       },
       cancelTemplateTitle: (params = {}) => {
         
@@ -140,7 +147,6 @@ window.addEventListener('load', () => {
             let t = { 
               id: cmd.params.id, title: cmd.params.title, items: [] };
             TEMPLATES.push(t);
-            storage.setItem('state', JSON.stringify(state));
           }
         }
         return true;
@@ -155,7 +161,7 @@ window.addEventListener('load', () => {
         {
           let t = TEMPLATES.find((t) => { return t.id === cmd.params.id; } );
           t.title = cmd.params.title;
-          storage.setItem('state', JSON.stringify(state));
+          t.editing = false;
         }
         return true;
       default:
@@ -165,16 +171,19 @@ window.addEventListener('load', () => {
     
     let updates;
     const startUpdates = () => {
+      if (updates && updates.readyState === 1) { return; }
       updates = new EventSource(`api/v1/updatestream?since=${state.latestSeenUpdate}&token=${TOKEN}`);
       updates.onmessage = (e) => {
         update = JSON.parse(e.data);
         if (handleUpdate(update)) {
           state.latestSeenUpdate = update.id;
-          storage.setItem('state', JSON.stringify(state));
+          save();
           render();
         }
       }
     }
+    startUpdates();
+    
     
     let ELEMENT = document.getElementById('mehrmalist');
     const render = () => {
@@ -410,14 +419,12 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('commit-template-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
-          template.title = document.getElementById(`input-template-title-${template.id}`).value;
-          template.editing = false;
-          storage.setItem('state', JSON.stringify(state));
-          
-          fetch('api/v1/update', Object.assign({body: JSON.stringify({action: 'commit-template-title', params: {id: template.id, title: template.title}})}, UPDATEOPTIONS())).then(r => console.log(r)).catch(e => console.error(e));
-          
-          render();
+          let id = event.target.dataset.templateid;
+          emit(
+            UPDATES.commitTemplateTitle({
+              id: id,
+              title: document.getElementById(`input-template-title-${id}`).value
+            }));
         });
       });
       
@@ -427,15 +434,12 @@ window.addEventListener('load', () => {
           switch (event.keyCode) {
             case 13 /* Enter */: 
               event.preventDefault(); event.stopPropagation();
-              { 
-                let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
-                template.title = document.getElementById(`input-template-title-${template.id}`).value;
-                template.editing = false;
-                storage.setItem('state', JSON.stringify(state));
-
-                fetch('api/v1/update', Object.assign({body: JSON.stringify({action: 'commit-template-title', params: {id: template.id, title: template.title}})}, UPDATEOPTIONS())).then(r => console.log(r)).catch(e => console.error(e));
-              }
-              render();
+              let id = event.target.dataset.templateid;
+              emit(
+                UPDATES.commitTemplateTitle({
+                  id: id,
+                  title: document.getElementById(`input-template-title-${id}`).value
+                }));
               break;
             case 27 /* Escape */: 
               event.preventDefault(); event.stopPropagation();
