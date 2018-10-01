@@ -28,6 +28,7 @@ window.addEventListener('load', () => {
       FOCUSSEDINPUTFIELDID = state.focussedInputFieldId;
       state.latestSeenUpdate = state.latestSeenUpdate || 0;
       state.status = state.status || 'logged-out';
+
     }
     
     const handleUpdate = (update) => {
@@ -136,8 +137,7 @@ window.addEventListener('load', () => {
         <a href="#" id="make-new-template">⊕</a>
       </h1>`;
       document.getElementById('template-header').innerHTML = templateHeaderContent;
-      
-      
+            
       const formatItemForTemplate = (item, template) => {
         return `
         <li class="${item.editing ? 'editing' : ''}" 
@@ -172,7 +172,7 @@ window.addEventListener('load', () => {
                         <a href='#' class="make-new-list-from-this" data-templateid="${t.id}">❏</a>
 
                         ${t.expanded ? `<ul>
-                          ${t.items.reduce((acc, item) => {return acc + formatItemForTemplate(item, t); }, '')}
+                          ${t.items.reduce((acc, item) => {return acc + `<li>${item.title}</li>`}, '')}
                           <li><a href='#' class="add-item-to-template" data-templateid="${t.id}">⊕</a></li>
                           </ul>` : ''} 
                     </li>`;
@@ -225,6 +225,7 @@ window.addEventListener('load', () => {
             `<span class="listitem-title" id="listitem-title-${item.id}">${item.title}
              ${item.done ? '' : `<a href='#' class="edit-item-title" data-itemid=${item.id} data-listid="${list.id}">✍︎</a>`}</span>`
           }
+          
         </li>`;
       };
       
@@ -430,13 +431,14 @@ window.addEventListener('load', () => {
           event.preventDefault(); event.stopPropagation();
           let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
           let newList = {};
-          newList.id = `l_${LISTS.length + 1}`;
+          newList.id = `l_${lists.length + 1}`;
           newList.title = template.title;
           newList.items = [...template.items];
           
-          LISTS.push(newList);
-          state.currentListId = CURRENTLISTID = newList.id;
-          storage.setItem('state', JSON.stringify(state));
+          lists.push(newList);
+          currentListId = newList.id;
+          storage.setItem('lists', JSON.stringify(lists));
+          storage.setItem('currentListId', currentListId);
           render();
         });
       });
@@ -520,9 +522,9 @@ window.addEventListener('load', () => {
       /* Make list current list by clicking on it */
       Array.from(document.getElementsByClassName('list')).map((el) => {
         el.addEventListener('click', (event) => {
-          let list = LISTS.find((l) => { return l.id === event.target.id });
-          state.currentListId = CURRENTLISTID = list.id;
-          storage.setItem('state', JSON.stringify(state));
+          let list = lists.find((l) => { return l.id === event.target.id });
+          currentListId = list.id;
+          storage.setItem('currentListId', currentListId);
           render();
         });
       });
@@ -570,11 +572,11 @@ window.addEventListener('load', () => {
       /* Toggle item's “done” status by clicking on it */
       Array.from(document.getElementsByClassName('listitem')).map((el) => {
         el.addEventListener('click', (event) => {
-          let list = LISTS.find((l) => { return l.id === CURRENTLISTID });
+          let list = lists.find((l) => { return l.id === currentListId });
           let item = list.items.find((item) => { return item.id === event.target.id });
           item.done = !item.done;
           
-          storage.setItem('state', JSON.stringify(state));
+          storage.setItem('lists', JSON.stringify(lists));
           render();          
         })
       });
@@ -583,7 +585,7 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('edit-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
+          let list = lists.find((l) => { return l.id === event.target.dataset.listid });
           let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
           item.editing = true;
           FOCUSSEDINPUTFIELDID = `input-item-title-${list.id}-${item.id}`;
@@ -595,11 +597,11 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('commit-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
+          let list = lists.find((l) => { return l.id === event.target.dataset.listid });
           let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
           item.title = document.getElementById(`input-item-title-${list.id}-${item.id}`).value;
           item.editing = false;
-          storage.setItem('state', JSON.stringify(state));
+          storage.setItem('lists', JSON.stringify(lists));
           render();          
         });
       });
@@ -608,41 +610,13 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('cancel-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
+          let list = lists.find((l) => { return l.id === event.target.dataset.listid });
           let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
           item.editing = false;
           render();
         });
       });
       
-      /* Commit/cancel item title with enter/escape */
-      Array.from(document.getElementsByClassName('input-item-title')).map((el) => {
-        el.addEventListener('keyup', (event) => {
-          switch (event.keyCode) {
-            case 13 /* Enter */: 
-              event.preventDefault(); event.stopPropagation();
-              { 
-                let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
-                let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
-                item.title = document.getElementById(`input-item-title-${list.id}-${item.id}`).value;
-                item.editing = false;
-                storage.setItem('state', JSON.stringify(state));
-              }
-              render();
-              break;
-            case 27 /* Escape */: 
-              event.preventDefault(); event.stopPropagation();
-              {
-                let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
-                let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
-                item.editing = false;
-              }
-              render();
-              break;
-            default: break;
-          }
-        });
-      });
       
     };
     
