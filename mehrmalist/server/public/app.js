@@ -94,7 +94,7 @@ window.addEventListener('load', () => {
       },
       editTemplateItemTitle: (params = {}) => {
         return {
-          sync: true,
+          sync: false,
           action: 'edit-template-item-title',
           params: {
             tid: params.tid, 
@@ -114,7 +114,14 @@ window.addEventListener('load', () => {
         }
       },
       cancelTemplateItemTitle: (params = {}) => {
-        
+        return {
+          sync: false,
+          action: 'cancel-template-item-title',
+          params: {
+            tid: params.tid,
+            iid: params.iid
+          }
+        }
       },
       
       makeNewListFromTemplate: (params = {}) => {
@@ -223,6 +230,13 @@ window.addEventListener('load', () => {
           let t = TEMPLATES.find((t) => { return t.id === cmd.params.tid; } );
           let i = t.items.find((i) => { return i.id === cmd.params.iid; } );
           i.title = cmd.params.title;
+          i.editing = false;
+        }
+        return true;
+      case 'cancel-template-item-title':
+        {
+          let t = TEMPLATES.find((t) => { return t.id === cmd.params.tid; } );
+          let i = t.items.find((i) => { return i.id === cmd.params.iid; } );
           i.editing = false;
         }
         return true;
@@ -576,10 +590,12 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('cancel-template-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid });
-          let item = template.items.find((i) => { return i.id === event.target.dataset.itemid });
-          item.editing = false;
-          render();
+          emit(
+            UPDATES.cancelTemplateItemTitle({
+              tid: event.target.dataset.templateid,
+              iid: event.target.dataset.itemid
+            })
+          );
         });
       });
       
@@ -610,9 +626,12 @@ window.addEventListener('load', () => {
             case 27 /* Escape */: 
               event.preventDefault(); event.stopPropagation();
               {
-                let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid });
-                let item = template.items.find((i) => { return i.id === event.target.dataset.itemid });
-                item.editing = false;
+                emit(
+                  UPDATES.cancelTemplateItemTitle({
+                    tid: event.target.dataset.templateid,
+                    iid: event.target.dataset.itemid
+                  })
+                );
               }
               render();
               break;
