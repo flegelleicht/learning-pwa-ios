@@ -455,14 +455,13 @@ window.addEventListener('load', () => {
           event.preventDefault(); event.stopPropagation();
           let template = TEMPLATES.find((t) => { return t.id === event.target.dataset.templateid; } );
           let newList = {};
-          newList.id = `l_${lists.length + 1}`;
+          newList.id = `l_${LISTS.length + 1}`;
           newList.title = template.title;
           newList.items = [...template.items];
           
-          lists.push(newList);
-          currentListId = newList.id;
-          storage.setItem('lists', JSON.stringify(lists));
-          storage.setItem('currentListId', currentListId);
+          LISTS.push(newList);
+          state.currentListId = CURRENTLISTID = newList.id;
+          storage.setItem('state', JSON.stringify(state));
           render();
         });
       });
@@ -596,11 +595,10 @@ window.addEventListener('load', () => {
       /* Toggle item's “done” status by clicking on it */
       Array.from(document.getElementsByClassName('listitem')).map((el) => {
         el.addEventListener('click', (event) => {
-          let list = lists.find((l) => { return l.id === currentListId });
+          let list = LISTS.find((l) => { return l.id === currentListId });
           let item = list.items.find((item) => { return item.id === event.target.id });
           item.done = !item.done;
-          
-          storage.setItem('lists', JSON.stringify(lists));
+          storage.setItem('state', JSON.stringify(state));
           render();          
         })
       });
@@ -609,7 +607,7 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('edit-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
           let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
           item.editing = true;
           FOCUSSEDINPUTFIELDID = `input-item-title-${list.id}-${item.id}`;
@@ -621,11 +619,11 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('commit-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
           let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
           item.title = document.getElementById(`input-item-title-${list.id}-${item.id}`).value;
           item.editing = false;
-          storage.setItem('lists', JSON.stringify(lists));
+          storage.setItem('state', JSON.stringify(state));
           render();          
         });
       });
@@ -634,7 +632,7 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('cancel-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = lists.find((l) => { return l.id === event.target.dataset.listid });
+          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid });
           let item = list.items.find((i) => { return i.id === event.target.dataset.itemid });
           item.editing = false;
           render();
