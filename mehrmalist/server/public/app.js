@@ -433,6 +433,9 @@ window.addEventListener('load', () => {
             render();
           }
         }
+      };
+      updates.onerror = (e) => {
+        console.log(e);
       }
       
       // updates.onClose() => set up with current latestSeenUpdate FIXME!
