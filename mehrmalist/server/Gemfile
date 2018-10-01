@@ -8,3 +8,7 @@ gem "thin"
 gem "sinatra"
 gem "jwt"
 gem "json"
+gem "sqlite3"
+gem "sequel"
+gem "bcrypt"
+

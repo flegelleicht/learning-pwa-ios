@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    bcrypt (3.1.12)
     daemons (1.2.6)
     eventmachine (1.2.7)
     json (2.1.0)
@@ -9,11 +10,13 @@ GEM
     rack (2.0.5)
     rack-protection (2.0.4)
       rack
+    sequel (5.13.0)
     sinatra (2.0.4)
       mustermann (~> 1.0)
       rack (~> 2.0)
       rack-protection (= 2.0.4)
       tilt (~> 2.0)
+    sqlite3 (1.3.13)
     thin (1.7.2)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
@@ -24,9 +27,12 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bcrypt
   json
   jwt
+  sequel
   sinatra
+  sqlite3
   thin
 
 BUNDLED WITH
