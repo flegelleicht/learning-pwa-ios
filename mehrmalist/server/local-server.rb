@@ -8,6 +8,7 @@ require 'jwt'
 require 'json'
 require 'pp'
 require 'cgi'
+require 'sequel'
 
 class Application < Sinatra::Base
   
@@ -55,6 +56,11 @@ class Application < Sinatra::Base
   
   def initialize
     super
+    
+    Sequel.sqlite(File.dirname(__FILE__) + "/db/database.db")
+    require_relative './db/models/user'
+    require_relative './db/models/update'
+    
     @account = {
       "#{ENV['MEHRMALIST_USER']}" => "#{ENV['MEHRMALIST_PASS']}"
     }
@@ -71,7 +77,8 @@ class Application < Sinatra::Base
   before do
     begin
       request.body.rewind
-      @req = JSON.parse request.body.read
+      @rawJsonBody = request.body.read
+      @req = JSON.parse @rawJsonBody
     rescue JSON::ParserError
       @req = {}
       # halt 400, { 'Content-Type' => 'text/javascript' }, {message: 'Error in request json '}.to_json
@@ -86,14 +93,14 @@ class Application < Sinatra::Base
     JWT.encode payload(user), ENV['MEHRMALIST_JWT_SECRET'], 'HS256'
   end
   
-  def payload(username)
+  def payload(user)
     {
       exp: Time.now.to_i + 60 * 60 * 24,
       iat: Time.now.to_i,
       iss: ENV['MEHRMALIST_JWT_ISSUER'],
       scopes: ['get_state', 'add_change'],
       user: {
-        username: username
+        id: user.id
       }
     }
   end
@@ -103,10 +110,12 @@ class Application < Sinatra::Base
   end
   
   post '/api/v1/login' do
-    user = @req['user']
-    pass = @req['pass']
+    login = @req['user']
+    passw = @req['pass']
 
-    if @account[user] == pass
+    user = User.find(login: login)
+
+    if user and user.authenticate?(passw)
       content_type :json
       { token: token(user)}.to_json
     else
@@ -122,7 +131,7 @@ class Application < Sinatra::Base
   
   # FROM https://gist.github.com/rkh/1476463
   get '/api/v1/updatestream', provides: 'text/event-stream' do
-    username = request.env[:user]['username'].to_sym
+    username = request.env[:user]['id'].to_s
     unless (@@connections[username])
       @@connections[username] = []
     end
@@ -130,12 +139,14 @@ class Application < Sinatra::Base
       @@connections[username] << out
       out.callback { @@connections[username].delete(out) }
       
-      updates = @@updates[username]
-      if updates
-        if params['since']
-          lastSeen = params['since'].to_i
-          updates.select {|u| u[:id] > lastSeen}.map do |u|
-            out << "data: #{u.to_json}\n\n"
+      if params['since']
+        last = params['since'].to_i
+        user = User.find(id: request.env[:user]['id'])
+
+        if user
+          updates = user.updates
+          updates.select{|u| u.id > last }.map do |u|
+            out << "data: #{u.to_hash.to_json}\n\n"
           end
         end
       end
@@ -160,24 +171,20 @@ class Application < Sinatra::Base
   end
   
   post '/api/v1/update' do
-    user = request.env[:user]
-    pp user
-    username = user['username'].to_sym
-    unless (@@updates[username])
-      @@updates[username] = []
-    end
-    update = {
-      id: @@updates[username].length + 1,
-      at: Time.now.to_i,
-      upd: @req
-    }
-    @@updates[username] << update
-    pp update
-    @@connections[username].each {|out| 
-      # https://www.html5rocks.com/en/tutorials/eventsource/basics/#toc-event-stream-format
-      out << "data: #{update.to_json}\n\n" }
-    content_type 'text/javascript'
-    {message: 'Update successful'}.to_json
+    user = User.find(id: request.env[:user]['id'])
+    if user
+      update = user.add_update(upd: @rawJsonBody)
+      
+      puts update.to_hash.to_json
+      @@connections[user.id.to_s].each do |out|
+        out << "data: #{update.to_hash.to_json}\n\n"
+      end
+      
+      content_type 'text/javascript'
+      {message: 'Update successful'}.to_json
+    else
+      halt 401, {message: 'Unknown user'}.to_json
+    end      
   end
 
   def self.run!
