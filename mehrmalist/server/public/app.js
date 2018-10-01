@@ -226,7 +226,14 @@ window.addEventListener('load', () => {
         };
       },
       toggleListItemCompletion: (params = {}) => {
-        
+        return {
+          sync: true,
+          action: 'toggle-list-item-completion',
+          params: {
+            lid: params.lid,
+            iid: params.iid
+          }
+        };
       }
     }
     
@@ -395,6 +402,13 @@ window.addEventListener('load', () => {
           let l = LISTS.find((l) => { return l.id === cmd.params.lid });
           let i = l.items.find((i) => { return i.id === cmd.params.iid });
           i.editing = false;
+        }
+        return true;
+      case 'toggle-list-item-completion':
+        {
+          let l = LISTS.find((l) => { return l.id === cmd.params.lid });
+          let i = l.items.find((i) => { return i.id === cmd.params.iid });
+          i.done = !i.done;
         }
         return true;
       default:
@@ -943,11 +957,12 @@ window.addEventListener('load', () => {
       /* Toggle item's “done” status by clicking on it */
       Array.from(document.getElementsByClassName('listitem')).map((el) => {
         el.addEventListener('click', (event) => {
-          let list = LISTS.find((l) => { return l.id === currentListId });
-          let item = list.items.find((item) => { return item.id === event.target.id });
-          item.done = !item.done;
-          storage.setItem('state', JSON.stringify(state));
-          render();          
+          emit(
+            UPDATES.toggleListItemCompletion({
+              lid: CURRENTLISTID,
+              iid: event.target.id
+            })
+          );
         })
       });
       
