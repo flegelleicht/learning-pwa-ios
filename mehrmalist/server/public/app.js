@@ -144,7 +144,6 @@ window.addEventListener('load', () => {
           }
         };
       },
-
       editListTitle: (params = {}) => {
         return {
           sync: false,
@@ -155,7 +154,14 @@ window.addEventListener('load', () => {
         };
       },
       commitListTitle: (params = {}) => {
-        
+        return {
+          sync: true,
+          action: 'commit-list-title',
+          params: {
+            lid: params.lid,
+            title: params.title
+          }
+        };
       },
       cancelListTitle: (params = {}) => {
         
@@ -294,6 +300,13 @@ window.addEventListener('load', () => {
           let l = LISTS.find((l) => { return l.id === cmd.params.lid; })
           l.editing = true;
           state.focussedInputFieldId = FOCUSSEDINPUTFIELDID = l.id;
+        }
+        return true;
+      case 'commit-list-title':
+        {
+          let l = LISTS.find((l) => { return l.id === cmd.params.lid; })
+          l.title = cmd.params.title;
+          l.editing = false;
         }
         return true;
       default:
@@ -735,11 +748,13 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('commit-list-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid; } );
-          list.title = document.getElementById(`input-list-title-${list.id}`).value;
-          list.editing = false;
-          storage.setItem('state', JSON.stringify(state));
-          render();
+          let id = event.target.dataset.listid;
+          emit(
+            UPDATES.commitListTitle({
+              lid: id,
+              title: document.getElementById(`input-list-title-${id}`).value
+            })
+          );
         });
       });
       
@@ -750,12 +765,14 @@ window.addEventListener('load', () => {
             case 13 /* Enter */: 
               event.preventDefault(); event.stopPropagation();
               { 
-                let list = LISTS.find((l) => { return l.id === event.target.dataset.listid; } );
-                list.title = document.getElementById(`input-list-title-${list.id}`).value;
-                list.editing = false;
-                storage.setItem('state', JSON.stringify(state));
+                let id = event.target.dataset.listid;
+                emit(
+                  UPDATES.commitListTitle({
+                    lid: id,
+                    title: document.getElementById(`input-list-title-${id}`).value
+                  })
+                );
               }
-              render();
               break;
             case 27 /* Escape */: 
               event.preventDefault(); event.stopPropagation();
