@@ -164,7 +164,13 @@ window.addEventListener('load', () => {
         };
       },
       cancelListTitle: (params = {}) => {
-        
+        return {
+          sync: false,
+          action: 'cancel-list-title',
+          params: {
+            lid: params.lid
+          }
+        };
       },
       selectList: (params = {}) => {
         
@@ -306,6 +312,12 @@ window.addEventListener('load', () => {
         {
           let l = LISTS.find((l) => { return l.id === cmd.params.lid; })
           l.title = cmd.params.title;
+          l.editing = false;
+        }
+        return true;
+      case 'cancel-list-title':
+        {
+          let l = LISTS.find((l) => { return l.id === cmd.params.lid; })
           l.editing = false;
         }
         return true;
@@ -777,9 +789,9 @@ window.addEventListener('load', () => {
             case 27 /* Escape */: 
               event.preventDefault(); event.stopPropagation();
               {
-                let list = LISTS.find((l) => { return l.id === event.target.dataset.listid; } );
-                list.editing = false;
-                storage.setItem('state', JSON.stringify(state));
+                emit(
+                  UPDATES.cancelListTitle({lid: event.target.dataset.listid})
+                );
               }
               render();
               break;
@@ -792,9 +804,9 @@ window.addEventListener('load', () => {
       Array.from(document.getElementsByClassName('cancel-list-title')).map((el) => {
         el.addEventListener('click', (event) => {
           event.preventDefault(); event.stopPropagation();
-          let list = LISTS.find((l) => { return l.id === event.target.dataset.listid; } );
-          list.editing = false;
-          render();
+          emit(
+            UPDATES.cancelListTitle({lid: event.target.dataset.listid})
+          );
         });
       });
             
