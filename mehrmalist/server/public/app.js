@@ -454,11 +454,14 @@ window.addEventListener('load', () => {
       if (state.status === 'logged-out') {
         // Show only the login elements
         let html = `
+          <div id="login-form-container">
+          <h1 id="login-form-title">Mehrmalist</h1>
           <form id="login-form">
             <input type="text" id="login-user" value="" placeholder="Nutzer">
             <input type="password" id="login-pass" value="" placeholder="Passwort">
-            <input type="submit" value="Senden">
-          </form>`;
+            <input type="submit" value="Anmelden">
+          </form>
+          </div>`;
         ELEMENT.innerHTML = html;
         
         // Set up listeners
