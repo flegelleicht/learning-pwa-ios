@@ -1,12 +1,11 @@
-const VERSION = '0.3.1';
+const VERSION = '0.3.3';
 const CACHE_VERSION = 'v' + VERSION;
 
 let cachedUrls = [
   '/',
   'index.html',
+  'manifest.json',
   'app.js',
-  'templates.js',
-  'manifest.json'
 ]
 
 self.addEventListener('install', (event) => {

@@ -46,11 +46,7 @@
           "Droid Sans", "Helvetica Neue", sans-serif;
       background-color: var(--ml-backgroundColor);
       color: var(--ml-color);
-      width:100vw;
-      height:100vh;
     }
-    body { width: inherit; height: inherit;}
-    #mehrmalist {width:inherit; height:inherit;}
     h1 { 
       font-size: 2rem; 
       font-weight: bold;
@@ -134,7 +130,7 @@
       background-color: #ddd;
     }
     #login-form-container {
-      width:inherit; height:inherit;
+      width:100vw; height:100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -159,6 +155,16 @@
       border-radius: 2px;
       margin-bottom:0.2em;
       padding: 0.5em;
+    }
+    #logout-button {
+      background-color: var(--ml-backgroundColor);
+      border-radius: 2px;
+      border: 2px solid var(--ml-color);
+      color: var(--ml-color);
+      cursor:pointer;
+      position:absolute;
+      right:1em;
+      top:2.4em;
     }
   </style>
 </head>
