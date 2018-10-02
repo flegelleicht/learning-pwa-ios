@@ -46,7 +46,11 @@
           "Droid Sans", "Helvetica Neue", sans-serif;
       background-color: var(--ml-backgroundColor);
       color: var(--ml-color);
+      width:100vw;
+      height:100vh;
     }
+    body { width: inherit; height: inherit;}
+    #mehrmalist {width:inherit; height:inherit;}
     h1 { 
       font-size: 2rem; 
       font-weight: bold;
@@ -128,6 +132,33 @@
     
     .edit-item-title:hover {
       background-color: #ddd;
+    }
+    #login-form-container {
+      width:inherit; height:inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content:center;
+    }
+    #login-form-title {
+      margin:1em 0;
+      padding:0;
+      font-family: Garamond, serif;
+      color: var(--ml-color);
+      font-weight: normal;
+    }
+    #login-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #login-form input {
+      font-size:100%;
+      border: none;
+      border-radius: 2px;
+      margin-bottom:0.2em;
+      padding: 0.5em;
     }
   </style>
 </head>
