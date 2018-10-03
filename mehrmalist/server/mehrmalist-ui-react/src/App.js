@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 
-import Login from './components/Login.js';
+import Login  from './components/Login.js';
+import Logout from './components/Logout.js';
 
 class App extends Component {
   constructor(props) {
@@ -11,6 +12,7 @@ class App extends Component {
       loggedIn: false
     };
     this.login = this.login.bind(this);
+    this.logout = this.logout.bind(this);
   }
   
   login(token) {
@@ -20,11 +22,22 @@ class App extends Component {
     })
   }
   
+  logout() {
+    this.setState({
+      token: null,
+      loggedIn: false
+    });
+  }
+  
   render() {
     return (
       <div>
-        {this.state.loggedIn ? 
-          <div>!</div> : <Login onLogin={this.login} /> }
+        { 
+          !this.state.loggedIn ? 
+          <Login onLogin={this.login} /> 
+          :
+          <Logout onLogout={this.logout}/>
+        }
       </div>
     );
   }
