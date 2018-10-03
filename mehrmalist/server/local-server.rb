@@ -116,11 +116,20 @@ class Application < Sinatra::Base
     user = User.find(login: login)
 
     if user and user.authenticate?(passw)
+      headers "Access-Control-Allow-Origin"   => "http://localhost:3000"
       content_type :json
       { token: token(user)}.to_json
     else
       halt 401
     end
+  end
+  
+  options '/api/v1/login' do
+    headers "Allow" => "POST, OPTIONS"
+    headers "Access-Control-Allow-Headers"  => "access-control-allow-origin"
+    headers "Access-Control-Allow-Origin"   => "http://localhost:3000"
+    headers "Access-Control-Allow-Methods"  => "POST"
+    halt 200
   end
   
   get '/api/v1/state' do
