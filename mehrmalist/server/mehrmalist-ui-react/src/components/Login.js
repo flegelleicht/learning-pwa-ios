@@ -26,7 +26,7 @@ class Login extends Component {
     .then(response => {
       if (response.ok) {
         response.json().then(json => {
-          console.log(`Logged in with token '${json.token}'`);
+          this.props.onLogin(json.token);
         });
       }
     })
