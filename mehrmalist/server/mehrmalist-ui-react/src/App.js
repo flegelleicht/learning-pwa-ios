@@ -21,18 +21,10 @@ class App extends Component {
   }
   
   render() {
-    const isLoggedIn = this.state.loggedIn;
-    let screen;
-    
-    if (isLoggedIn) {
-      screen = <div>To be continued</div>;
-    } else {
-      screen = <Login onLogin={this.login} />;
-    }
-
     return (
       <div>
-        {screen}
+        {this.state.loggedIn ? 
+          <div>!</div> : <Login onLogin={this.login} /> }
       </div>
     );
   }
