@@ -59,7 +59,7 @@ class Template extends Component {
       { t.expanded ? 
         <ul>
         { t.items.map((el) => { 
-          return <TemplateItem key={el.id} title={el.title}/> })}
+          return <TemplateItem key={el.id} item={el} template={t}/> })}
         </ul>
       :
         ''
@@ -70,8 +70,47 @@ class Template extends Component {
 }
 
 const TemplateItem = (props) => {
+  const item = props.item;
+  const template = props.template;
   return (
-    <li>{props.title}</li>
+    <li 
+      className="{item.editing ? 'editing' : ''}" 
+      id="{item.id}">
+      
+      {
+        item.editing ?
+        <React.Fragment>
+        <input 
+          type="text" 
+          value="{item.title}" 
+          className="input-template-item-title" id="input-template-item-title-{template.id}-{item.id}" data-templateid={template.id} 
+          data-itemid={item.id}
+        />
+        <button 
+          className="commit-template-item-title" 
+          data-templateid={template.id}
+          data-itemid={item.id}>
+          <span role="img" aria-label="save new title">✓</span>
+        </button>
+        <button 
+          className="cancel-template-item-title" 
+          data-templateid={template.id}
+          data-itemid={item.id}>
+          <span role="img" aria-label="discard changes">𐄂</span>
+        </button>          
+        </React.Fragment>
+      :
+        <React.Fragment>
+        <span className="templateitem" id={item.id}>{item.title}</span>
+        <button 
+          className="edit-template-item-title" 
+          data-templateid={template.id} 
+          data-itemid={item.id}>
+          <span role="img" aria-label="edit template item title">✍︎</span>
+        </button>
+        </React.Fragment>
+      }
+    </li>
   );
 }
 
