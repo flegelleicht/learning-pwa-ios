@@ -32,6 +32,9 @@ class App extends Component {
     this.logout = this.logout.bind(this);
     this.onNewTemplate = this.onNewTemplate.bind(this);
     this.onToggleExpandTemplate = this.onToggleExpandTemplate.bind(this);
+    this.onEditTemplateTitle = this.onEditTemplateTitle.bind(this);
+    this.onCancelEditTemplateTitle = this.onCancelEditTemplateTitle.bind(this);
+    this.onCommitEditTemplateTitle = this.onCommitEditTemplateTitle.bind(this);
   }
   
   login(token) {
@@ -59,6 +62,23 @@ class App extends Component {
     this.setState({templates: this.state.templates});
   }
   
+  onEditTemplateTitle(template) {
+    console.log(`onEditTemplateTitle for: ${template.id}`);
+    template.editing = true;
+    this.setState({templates: this.state.templates});
+  }
+  
+  onCancelEditTemplateTitle(template) {
+    template.editing = false;
+    this.setState({templates: this.state.templates});
+  }
+  
+  onCommitEditTemplateTitle(template, title) {
+    template.editing = false;
+    template.title = title;
+    this.setState({templates: this.state.templates});
+  }
+  
   render() {
     return (
       <React.Fragment>
@@ -71,7 +91,11 @@ class App extends Component {
             <Templates 
               templates={this.state.templates}
               onNewTemplate={this.onNewTemplate}
-              onToggleExpandTemplate={this.onToggleExpandTemplate}/>
+              onToggleExpandTemplate={this.onToggleExpandTemplate}
+              onEditTemplateTitle={this.onEditTemplateTitle}
+              onCancelEditTemplateTitle={this.onCancelEditTemplateTitle}
+              onCommitEditTemplateTitle={this.onCommitEditTemplateTitle}
+            />
           </React.Fragment>
         }
       </React.Fragment>

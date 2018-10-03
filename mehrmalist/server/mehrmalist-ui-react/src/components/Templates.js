@@ -4,14 +4,27 @@ class Template extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      newTitle: '',
+      newTitle: props.template.title,
     }
     this.onChangeTitle = this.onChangeTitle.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
   }
   
   onChangeTitle(event) {
     this.setState({newTitle: event.target.value});
   } 
+  
+  onKeyUp(event) {
+    switch (event.key) {
+    case 'Enter':
+      this.props.onCommitEditTemplateTitle(this.props.template, this.state.newTitle);
+      break;
+    case 'Escape':
+      this.props.onCancelEditTemplateTitle(this.props.template);
+      break;
+    default: break;
+    }
+  }
 
   render() {
     const t = this.props.template;
@@ -21,23 +34,27 @@ class Template extends Component {
         <React.Fragment>
         <input 
           type="text" 
-          value={t.title}
+          value={this.state.newTitle}
           onChange={this.onChangeTitle}
+          onKeyUp={this.onKeyUp}
           className="input-template-title" 
           id="input-template-title-{t.id}" 
           data-templateid={t.id} />
         <button 
           className="commit-template-title" 
-          data-templateid="{t.id}">
+          data-templateid="{t.id}"
+          onClick={() => this.props.onCommitEditTemplateTitle(t, this.state.newTitle)}>
           <span role="img" aria-label="save new title">✓</span>
         </button>
         <button 
           className="cancel-template-title" 
-          data-templateid="{t.id}">
+          data-templateid="{t.id}"
+          onClick={() => this.props.onCancelEditTemplateTitle(t)}>
           <span role="img" aria-label="discard changes">𐄂</span>
         </button>
         </React.Fragment>
       :
+        <React.Fragment>
         <span 
           className="template" 
           id={t.id}
@@ -45,12 +62,14 @@ class Template extends Component {
           >
           {t.title}
         </span>
-      }
         <button 
           className="edit-template-title" 
-          data-templateid={t.id}>
+          data-templateid={t.id}
+          onClick={() => this.props.onEditTemplateTitle(t)}>
           <span role="img" aria-label="edit template">✍︎</span>
         </button>
+        </React.Fragment>
+      }
         <button 
           className="make-new-list-from-this" 
           data-templateid={t.id}>
@@ -125,6 +144,8 @@ class Templates extends Component {
           template={el}
           onToggleExpandTemplate={this.props.onToggleExpandTemplate}
           onEditTemplateTitle={this.props.onEditTemplateTitle}
+          onCancelEditTemplateTitle={this.props.onCancelEditTemplateTitle}
+          onCommitEditTemplateTitle={this.props.onCommitEditTemplateTitle}
         />
       );
     });
