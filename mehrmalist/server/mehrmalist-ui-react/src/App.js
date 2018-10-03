@@ -3,16 +3,35 @@ import './App.css';
 
 import Login  from './components/Login.js';
 import Logout from './components/Logout.js';
+import Templates from './components/Templates.js';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       token: null,
-      loggedIn: false
+      loggedIn: false,
+      templates: [
+        {
+          id: "t_iwzGDrRw",
+          title: "Wocheneinkauf",
+          items: [
+            { id: "ti_xtgKGhLW",   title: "Brot" },
+            { id: "ti_Xiedbcu5",   title: "Frischkäse" },
+            { id: "ti_rf8KJAce",   title: "Käse" },
+            { id: "ti_3c6kQszZ",   title: "Eier" },
+            { id: "ti_U0Skqkcy",   title: "Kaffee" },
+            { id: "ti_qCzGdC3q",   title: "Schwarzer Tee" },
+            { id: "ti_Be1PXZgf",   title: "Milch" },
+            { id: "ti_qt4oiiie",   title: "Avocado" },
+          ],
+        },
+      ],
     };
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
+    this.onNewTemplate = this.onNewTemplate.bind(this);
+    this.onToggleExpandTemplate = this.onToggleExpandTemplate.bind(this);
   }
   
   login(token) {
@@ -29,16 +48,33 @@ class App extends Component {
     });
   }
   
+  onNewTemplate() {
+    console.log(`onNewTemplate`);
+  }
+  
+  onToggleExpandTemplate(template){
+    console.log(`onToggleExpandTemplate for: ${template.id}`);
+    //let t = this.state.templates.findIndex((el) => el.id === templateId);
+    template.expanded = !template.expanded;
+    this.setState({templates: this.state.templates});
+  }
+  
   render() {
     return (
-      <div>
+      <React.Fragment>
         { 
           !this.state.loggedIn ? 
           <Login onLogin={this.login} /> 
           :
-          <Logout onLogout={this.logout}/>
+          <React.Fragment>
+            <Logout onLogout={this.logout}/>
+            <Templates 
+              templates={this.state.templates}
+              onNewTemplate={this.onNewTemplate}
+              onToggleExpandTemplate={this.onToggleExpandTemplate}/>
+          </React.Fragment>
         }
-      </div>
+      </React.Fragment>
     );
   }
 }
