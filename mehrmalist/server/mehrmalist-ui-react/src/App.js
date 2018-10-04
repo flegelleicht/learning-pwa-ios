@@ -4,6 +4,7 @@ import './App.css';
 import Login  from './components/Login.js';
 import Logout from './components/Logout.js';
 import Templates from './components/Templates.js';
+import Lists from './components/Lists.js';
 
 class App extends Component {
   constructor(props) {
@@ -27,6 +28,16 @@ class App extends Component {
           ],
         },
       ],
+      lists : [
+        {
+          id: "l_hNA71C5c",
+          title: "Wochenzweikauf",
+          items: [
+            { id: "li_jGP5s_QO", title: "Brot" },
+          ]
+        },
+      ],
+      currentList: 'l_hNA71C5c',
     };
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
@@ -95,6 +106,9 @@ class App extends Component {
               onEditTemplateTitle={this.onEditTemplateTitle}
               onCancelEditTemplateTitle={this.onCancelEditTemplateTitle}
               onCommitEditTemplateTitle={this.onCommitEditTemplateTitle}
+            />
+            <Lists
+              lists={this.state.lists}
             />
           </React.Fragment>
         }
