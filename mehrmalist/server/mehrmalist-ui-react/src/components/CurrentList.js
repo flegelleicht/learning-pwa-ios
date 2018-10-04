@@ -9,10 +9,16 @@ class CurrentList extends Component {
     
     this.onChangeQuickentry = this.onChangeQuickentry.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
+    this.onChangeItemTitle = this.onChangeItemTitle.bind(this);
   }
   
   onChangeQuickentry(event) {
     this.setState({quickentryValue: event.target.value});
+  }
+  
+  onChangeItemTitle(item) {
+    console.log(`onChangeItemTitle: ${item.id} ${item.title}`);
+    this.props.onChangeItemTitleInList(item, this.props.currentList);
   }
   
   onKeyUp(event) {
@@ -38,6 +44,7 @@ class CurrentList extends Component {
         key={el.id} 
         item={el}
         list={currentList}
+        onChangeItemTitle={this.onChangeItemTitle}
         />
     );
     return (
@@ -66,15 +73,46 @@ class CurrentListItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      editing: false,
       title: props.item.title
     }
-    this.onChangeTitle = this.onChangeTitle.bind(this);
+    this.onChangeTitle  = this.onChangeTitle.bind(this);
+    this.onEditTitle    = this.onEditTitle.bind(this);
+    this.onCommitTitle  = this.onCommitTitle.bind(this);
+    this.onCancelTitle  = this.onCancelTitle.bind(this);
+    this.onKeyUp        = this.onKeyUp.bind(this);
+  }
+  
+  onEditTitle (event) {
+    this.setState({ editing: true });
   }
   
   onChangeTitle(event) {
     this.setState({
       title: event.target.value
     });
+  }
+  
+  onCommitTitle () {
+    let item = {...this.props.item, title: this.state.title };
+    this.props.onChangeItemTitle(item);
+    this.setState({editing: false});
+  }
+  
+  onCancelTitle () {
+    this.setState({ editing: false });
+  }
+  
+  onKeyUp(event) {
+    switch (event.key) {
+    case 'Enter':
+      this.onCommitTitle();
+      break;
+    case 'Escape':
+      this.onCancelTitle();
+      break;
+    default: break;
+    }
   }
   
   render () {
@@ -86,24 +124,28 @@ class CurrentListItem extends Component {
       id={item.id}
       data-itemid={item.id}
       >
-      {item.editing ? 
+      {this.state.editing ? 
         <React.Fragment>
         <input 
           type="text" 
           value={this.state.title}
           onChange={this.onChangeTitle} 
+          onKeyUp={this.onKeyUp}
           className="input-item-title" id={`input-item-title-${list.id}-${item.id}`} 
           data-listid={list.id}
           data-itemid={item.id} />
           
         <button 
           className="commit-item-title" 
-          data-listid={list.id}>
+          data-listid={list.id}
+          onClick={this.onCommitTitle}>
           <span role="img" aria-label="save new title">✓</span>
         </button>
         <button 
           className="cancel-item-title" 
-          data-listid={list.id}>
+          data-listid={list.id}
+          onClick={this.onCancelTitle}
+          >
           <span role="img" aria-label="discard changes">𐄂</span>
         </button>
         </React.Fragment>
@@ -121,7 +163,8 @@ class CurrentListItem extends Component {
           <button 
             className="edit-item-title" 
             data-itemid={item.id} 
-            data-listid={list.id}>
+            data-listid={list.id}
+            onClick={this.onEditTitle}>
             <span role="img" aria-label="edit item title">✍︎</span>
           </button>
         }

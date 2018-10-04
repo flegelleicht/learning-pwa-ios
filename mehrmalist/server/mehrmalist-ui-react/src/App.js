@@ -50,6 +50,7 @@ class App extends Component {
     
     this.onSelectList = this.onSelectList.bind(this);
     this.onNewItemInList = this.onNewItemInList.bind(this);
+    this.onChangeItemTitleInList = this.onChangeItemTitleInList.bind(this);
   }
   
   login(token) {
@@ -112,6 +113,17 @@ class App extends Component {
     });
   }
   
+  onChangeItemTitleInList(item, list) {
+    console.log(`onChangeItemTitleInList: ${item.id} ${list.id}`);
+    
+    let l = this.state.lists.find((l) => l.id === list.id);
+    let i = l.items.find((i) => i.id === item.id);
+    i.title = item.title;
+    this.setState({
+      lists: this.state.lists,
+    });
+  }
+  
   render() {
     return (
       <React.Fragment>
@@ -137,6 +149,7 @@ class App extends Component {
               <CurrentList
                 currentList={this.state.currentList}
                 onNewItemInList={this.onNewItemInList}
+                onChangeItemTitleInList={this.onChangeItemTitleInList}
               />
             :
               <React.Fragment></React.Fragment>
