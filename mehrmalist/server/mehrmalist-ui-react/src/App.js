@@ -48,6 +48,7 @@ class App extends Component {
     this.onCancelEditTemplateTitle = this.onCancelEditTemplateTitle.bind(this);
     this.onCommitEditTemplateTitle = this.onCommitEditTemplateTitle.bind(this);
     
+    this.onNewListFromTemplate = this.onNewListFromTemplate.bind(this);
     this.onSelectList = this.onSelectList.bind(this);
     this.onNewItemInList = this.onNewItemInList.bind(this);
     this.onChangeItemTitleInList = this.onChangeItemTitleInList.bind(this);
@@ -95,6 +96,16 @@ class App extends Component {
     this.setState({templates: this.state.templates});
   }
   
+  onNewListFromTemplate(list, template) {
+    let items = template.items.map((i) => {
+      return {...i, id: i.id.replace(/^ti/, 'li')}});
+    list.items = items;
+    this.state.lists.push(list);
+    this.setState({
+      lists: this.state.lists
+    })
+  }
+  
   onSelectList(list) {
     let prev = this.state.lists.find((l) => l.isCurrentList === true);
     if (prev) prev.isCurrentList = false;
@@ -140,6 +151,7 @@ class App extends Component {
               onEditTemplateTitle={this.onEditTemplateTitle}
               onCancelEditTemplateTitle={this.onCancelEditTemplateTitle}
               onCommitEditTemplateTitle={this.onCommitEditTemplateTitle}
+              onNewListFromTemplate={this.onNewListFromTemplate}
             />
             <Lists
               lists={this.state.lists}

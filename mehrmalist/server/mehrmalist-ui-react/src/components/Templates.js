@@ -1,5 +1,43 @@
 import React, { Component } from 'react';
 
+class Templates extends Component {
+
+  render() {
+    
+    const mapped = this.props.templates.map((el, idx) => {
+      return (
+        <Template 
+          key={el.id} 
+          template={el}
+          onToggleExpandTemplate={this.props.onToggleExpandTemplate}
+          onEditTemplateTitle={this.props.onEditTemplateTitle}
+          onCancelEditTemplateTitle={this.props.onCancelEditTemplateTitle}
+          onCommitEditTemplateTitle={this.props.onCommitEditTemplateTitle}
+          onNewListFromTemplate={this.props.onNewListFromTemplate}
+        />
+      );
+    });
+    
+    return (
+      <React.Fragment>
+        <div id="template-header">
+          <h1>Vorlagen 
+            <button 
+              value=""
+              id="make-new-template"
+              onClick={this.props.onNewTemplate}>
+              ⊕
+            </button>
+          </h1>
+        </div>
+        <ul id="template-list">
+          {mapped}
+        </ul>
+      </React.Fragment>
+    );
+  }
+}
+
 class Template extends Component {
   constructor(props) {
     super(props);
@@ -8,6 +46,7 @@ class Template extends Component {
     }
     this.onChangeTitle = this.onChangeTitle.bind(this);
     this.onKeyUp = this.onKeyUp.bind(this);
+    this.onNewListFromTemplate = this.onNewListFromTemplate.bind(this);
   }
   
   onChangeTitle(event) {
@@ -25,6 +64,15 @@ class Template extends Component {
     default: break;
     }
   }
+  
+  onNewListFromTemplate(template) {
+    let list = {
+      id: `li_${Math.random().toString(36).substr(2)}`,
+      title: template.title,
+      items: []
+    }
+    this.props.onNewListFromTemplate(list, template);
+  }
 
   render() {
     const t = this.props.template;
@@ -38,7 +86,7 @@ class Template extends Component {
           onChange={this.onChangeTitle}
           onKeyUp={this.onKeyUp}
           className="input-template-title" 
-          id="input-template-title-{t.id}" 
+          id={`input-template-title-${t.id}`} 
           data-templateid={t.id} />
         <button 
           className="commit-template-title" 
@@ -72,7 +120,8 @@ class Template extends Component {
       }
         <button 
           className="make-new-list-from-this" 
-          data-templateid={t.id}>
+          data-templateid={t.id}
+          onClick={() => this.onNewListFromTemplate(t)}>
           <span role="img" aria-label="create list from template">❏</span>
         </button>
       { t.expanded ? 
@@ -131,43 +180,6 @@ const TemplateItem = (props) => {
       }
     </li>
   );
-}
-
-class Templates extends Component {
-
-  render() {
-    
-    const mapped = this.props.templates.map((el, idx) => {
-      return (
-        <Template 
-          key={el.id} 
-          template={el}
-          onToggleExpandTemplate={this.props.onToggleExpandTemplate}
-          onEditTemplateTitle={this.props.onEditTemplateTitle}
-          onCancelEditTemplateTitle={this.props.onCancelEditTemplateTitle}
-          onCommitEditTemplateTitle={this.props.onCommitEditTemplateTitle}
-        />
-      );
-    });
-    
-    return (
-      <React.Fragment>
-        <div id="template-header">
-          <h1>Vorlagen 
-            <button 
-              value=""
-              id="make-new-template"
-              onClick={this.props.onNewTemplate}>
-              ⊕
-            </button>
-          </h1>
-        </div>
-        <ul id="template-list">
-          {mapped}
-        </ul>
-      </React.Fragment>
-    );
-  }
 }
 
 export default Templates;
