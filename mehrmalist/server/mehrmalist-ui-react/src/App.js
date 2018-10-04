@@ -5,6 +5,7 @@ import Login  from './components/Login.js';
 import Logout from './components/Logout.js';
 import Templates from './components/Templates.js';
 import Lists from './components/Lists.js';
+import CurrentList from './components/CurrentList.js';
 
 class App extends Component {
   constructor(props) {
@@ -37,7 +38,7 @@ class App extends Component {
           ]
         },
       ],
-      currentList: 'l_hNA71C5c',
+      currentList: null,
     };
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
@@ -96,7 +97,10 @@ class App extends Component {
     let prev = this.state.lists.find((l) => l.isCurrentList === true);
     if (prev) prev.isCurrentList = false;
     list.isCurrentList = true;
-    this.setState({lists: this.state.lists});
+    this.setState({
+      lists: this.state.lists,
+      currentList: list
+    });
   }
   
   render() {
@@ -120,6 +124,13 @@ class App extends Component {
               lists={this.state.lists}
               onSelectList={this.onSelectList}
             />
+            { this.state.currentList ? 
+              <CurrentList
+                currentList={this.state.currentList}
+              />
+            :
+              <React.Fragment></React.Fragment>
+            }
           </React.Fragment>
         }
       </React.Fragment>
