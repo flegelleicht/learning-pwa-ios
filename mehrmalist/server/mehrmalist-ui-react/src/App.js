@@ -10,36 +10,41 @@ import CurrentList from './components/CurrentList.js';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      token: null,
-      loggedIn: false,
-      templates: [
-        {
-          id: "t_iwzGDrRw",
-          title: "Wocheneinkauf",
-          items: [
-            { id: "ti_xtgKGhLW",   title: "Brot" },
-            { id: "ti_Xiedbcu5",   title: "Frischkäse" },
-            { id: "ti_rf8KJAce",   title: "Käse" },
-            { id: "ti_3c6kQszZ",   title: "Eier" },
-            { id: "ti_U0Skqkcy",   title: "Kaffee" },
-            { id: "ti_qCzGdC3q",   title: "Schwarzer Tee" },
-            { id: "ti_Be1PXZgf",   title: "Milch" },
-            { id: "ti_qt4oiiie",   title: "Avocado" },
-          ],
-        },
-      ],
-      lists : [
-        {
-          id: "l_hNA71C5c",
-          title: "Wochenzweikauf",
-          items: [
-            { id: "li_jGP5s_QO", title: "Brot" },
-          ]
-        },
-      ],
-      currentList: null,
-    };
+    
+    this.state = JSON.parse(window.localStorage.getItem('state'));
+    if (!this.state) {
+      this.state = {
+        token: null,
+        loggedIn: false,
+        templates: [
+          {
+            id: "t_iwzGDrRw",
+            title: "Wocheneinkauf",
+            items: [
+              { id: "ti_xtgKGhLW",   title: "Brot" },
+              { id: "ti_Xiedbcu5",   title: "Frischkäse" },
+              { id: "ti_rf8KJAce",   title: "Käse" },
+              { id: "ti_3c6kQszZ",   title: "Eier" },
+              { id: "ti_U0Skqkcy",   title: "Kaffee" },
+              { id: "ti_qCzGdC3q",   title: "Schwarzer Tee" },
+              { id: "ti_Be1PXZgf",   title: "Milch" },
+              { id: "ti_qt4oiiie",   title: "Avocado" },
+            ],
+          },
+        ],
+        lists : [
+          {
+            id: "l_hNA71C5c",
+            title: "Wochenzweikauf",
+            items: [
+              { id: "li_jGP5s_QO", title: "Brot" },
+            ]
+          },
+        ],
+        currentList: null,
+      };
+      this.save();
+    }
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.onNewTemplate = this.onNewTemplate.bind(this);
@@ -54,11 +59,16 @@ class App extends Component {
     this.onChangeItemTitleInList = this.onChangeItemTitleInList.bind(this);
   }
   
+  save() {
+    window.localStorage.setItem('state', JSON.stringify(this.state));
+  }
+  
   login(token) {
     this.setState({
       token: token,
       loggedIn: true
-    })
+    });
+    this.save();
   }
   
   logout() {
