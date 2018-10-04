@@ -76,6 +76,7 @@ class App extends Component {
       token: null,
       loggedIn: false
     });
+    this.save();
   }
   
   onNewTemplate() {
@@ -87,23 +88,27 @@ class App extends Component {
     //let t = this.state.templates.findIndex((el) => el.id === templateId);
     template.expanded = !template.expanded;
     this.setState({templates: this.state.templates});
+    this.save();
   }
   
   onEditTemplateTitle(template) {
     console.log(`onEditTemplateTitle for: ${template.id}`);
     template.editing = true;
     this.setState({templates: this.state.templates});
+    this.save();
   }
   
   onCancelEditTemplateTitle(template) {
     template.editing = false;
     this.setState({templates: this.state.templates});
+    this.save();
   }
   
   onCommitEditTemplateTitle(template, title) {
     template.editing = false;
     template.title = title;
     this.setState({templates: this.state.templates});
+    this.save();
   }
   
   onNewListFromTemplate(list, template) {
@@ -113,7 +118,8 @@ class App extends Component {
     this.state.lists.push(list);
     this.setState({
       lists: this.state.lists
-    })
+    });
+    this.save();
   }
   
   onSelectList(list) {
@@ -124,6 +130,7 @@ class App extends Component {
       lists: this.state.lists,
       currentList: list
     });
+    this.save();
   }
   
   onNewItemInList(item, list) {
@@ -132,6 +139,7 @@ class App extends Component {
     this.setState({
       lists: this.state.lists,
     });
+    this.save();
   }
   
   onChangeItemTitleInList(item, list) {
@@ -143,6 +151,7 @@ class App extends Component {
     this.setState({
       lists: this.state.lists,
     });
+    this.save();
   }
   
   render() {
