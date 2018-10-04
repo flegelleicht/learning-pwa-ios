@@ -17,7 +17,11 @@ class CurrentList extends Component {
   render () {
     const currentList = this.props.currentList;
     const mapped = currentList.items.map((el) => 
-    <CurrentListItem key={el.id} item={el}/>
+      <CurrentListItem 
+        key={el.id} 
+        item={el}
+        list={currentList}
+        />
     );
     return (
       <React.Fragment>
@@ -40,9 +44,71 @@ class CurrentList extends Component {
 }
 
 class CurrentListItem extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: props.item.title
+    }
+    this.onChangeTitle = this.onChangeTitle.bind(this);
+  }
+  
+  onChangeTitle(event) {
+    this.setState({
+      title: event.target.value
+    });
+  }
+  
   render () {
+    const list = this.props.list;
+    const item = this.props.item;
     return (
-      <li>{this.props.item.title}</li>
+    <li 
+      className={`listitem bordered ${item.done ? 'done' : ''} ${item.editing ? 'editing' : ''}`} 
+      id={item.id}
+      data-itemid={item.id}
+      >
+      {item.editing ? 
+        <React.Fragment>
+        <input 
+          type="text" 
+          value={this.state.title}
+          onChange={this.onChangeTitle} 
+          className="input-item-title" id={`input-item-title-${list.id}-${item.id}`} 
+          data-listid={list.id}
+          data-itemid={item.id} />
+          
+        <button 
+          className="commit-item-title" 
+          data-listid={list.id}>
+          <span role="img" aria-label="save new title">✓</span>
+        </button>
+        <button 
+          className="cancel-item-title" 
+          data-listid={list.id}>
+          <span role="img" aria-label="discard changes">𐄂</span>
+        </button>
+        </React.Fragment>
+      :
+        <React.Fragment>
+        <span 
+          className="listitem-title" 
+          id={`listitem-title-${item.id}`} 
+          data-itemid={item.id}>
+          {item.title}
+        </span>
+        {item.done ? 
+          '' 
+        : 
+          <button 
+            className="edit-item-title" 
+            data-itemid={item.id} 
+            data-listid={list.id}>
+            <span role="img" aria-label="edit item title">✍︎</span>
+          </button>
+        }
+        </React.Fragment>
+      }
+    </li>
     );
   }
 }
