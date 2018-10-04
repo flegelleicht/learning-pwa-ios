@@ -67,16 +67,16 @@ class App extends Component {
     this.setState({
       token: token,
       loggedIn: true
-    });
-    this.save();
+    }, ()=>{this.save()});
+    ;
   }
   
   logout() {
+    console.log('logout');
     this.setState({
-      token: null,
+      token: ' ',
       loggedIn: false
-    });
-    this.save();
+    }, ()=>{this.save()});
   }
   
   onNewTemplate() {
@@ -87,28 +87,24 @@ class App extends Component {
     console.log(`onToggleExpandTemplate for: ${template.id}`);
     //let t = this.state.templates.findIndex((el) => el.id === templateId);
     template.expanded = !template.expanded;
-    this.setState({templates: this.state.templates});
-    this.save();
+    this.setState({templates: this.state.templates}, ()=>{this.save()});
   }
   
   onEditTemplateTitle(template) {
     console.log(`onEditTemplateTitle for: ${template.id}`);
     template.editing = true;
-    this.setState({templates: this.state.templates});
-    this.save();
+    this.setState({templates: this.state.templates}, ()=>{this.save()});
   }
   
   onCancelEditTemplateTitle(template) {
     template.editing = false;
-    this.setState({templates: this.state.templates});
-    this.save();
+    this.setState({templates: this.state.templates}, ()=>{this.save()});
   }
   
   onCommitEditTemplateTitle(template, title) {
     template.editing = false;
     template.title = title;
-    this.setState({templates: this.state.templates});
-    this.save();
+    this.setState({templates: this.state.templates}, ()=>{this.save()});
   }
   
   onNewListFromTemplate(list, template) {
@@ -118,8 +114,7 @@ class App extends Component {
     this.state.lists.push(list);
     this.setState({
       lists: this.state.lists
-    });
-    this.save();
+    }, ()=>{this.save()});
   }
   
   onSelectList(list) {
@@ -129,8 +124,7 @@ class App extends Component {
     this.setState({
       lists: this.state.lists,
       currentList: list
-    });
-    this.save();
+    }, ()=>{this.save()});
   }
   
   onNewItemInList(item, list) {
@@ -138,8 +132,7 @@ class App extends Component {
     l.items.push(item);
     this.setState({
       lists: this.state.lists,
-    });
-    this.save();
+    }, ()=>{this.save()});
   }
   
   onChangeItemTitleInList(item, list) {
@@ -150,8 +143,7 @@ class App extends Component {
     i.title = item.title;
     this.setState({
       lists: this.state.lists,
-    });
-    this.save();
+    }, ()=>{this.save()});
   }
   
   render() {
