@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 
-
-
 class Lists extends Component {
   
   render() {
     
-    const mapped = this.props.lists.map((el) => {
-      return <ListsList key={el.id} list={el} />
-    });
+    const mapped = this.props.lists.map((el) => 
+      <ListsList 
+        key={el.id} 
+        list={el} 
+        onSelectList={this.props.onSelectList}
+      />
+    );
     
     return (
       <React.Fragment>
@@ -28,6 +30,7 @@ class Lists extends Component {
 class ListsList extends Component {
   render () {
     const l = this.props.list;
+    const titleClassNames = 'list ' + (l.isCurrentList ? 'currentList' : '');
     return (
       <li>
         { l.editing ? 
@@ -52,8 +55,9 @@ class ListsList extends Component {
         : 
           <React.Fragment>
           <span 
-            className="list { l.isCurrentList ? `currentList` : ''}" 
+            className={titleClassNames} 
             id={l.id}
+            onClick={() => this.props.onSelectList(l)}
           >{l.title}</span>
           <button 
             className="edit-list-title" 

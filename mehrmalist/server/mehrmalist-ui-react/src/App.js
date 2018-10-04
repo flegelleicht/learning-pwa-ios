@@ -46,6 +46,8 @@ class App extends Component {
     this.onEditTemplateTitle = this.onEditTemplateTitle.bind(this);
     this.onCancelEditTemplateTitle = this.onCancelEditTemplateTitle.bind(this);
     this.onCommitEditTemplateTitle = this.onCommitEditTemplateTitle.bind(this);
+    
+    this.onSelectList = this.onSelectList.bind(this);
   }
   
   login(token) {
@@ -90,6 +92,13 @@ class App extends Component {
     this.setState({templates: this.state.templates});
   }
   
+  onSelectList(list) {
+    let prev = this.state.lists.find((l) => l.isCurrentList === true);
+    if (prev) prev.isCurrentList = false;
+    list.isCurrentList = true;
+    this.setState({lists: this.state.lists});
+  }
+  
   render() {
     return (
       <React.Fragment>
@@ -109,6 +118,7 @@ class App extends Component {
             />
             <Lists
               lists={this.state.lists}
+              onSelectList={this.onSelectList}
             />
           </React.Fragment>
         }
