@@ -49,6 +49,7 @@ class App extends Component {
     this.onCommitEditTemplateTitle = this.onCommitEditTemplateTitle.bind(this);
     
     this.onSelectList = this.onSelectList.bind(this);
+    this.onNewItemInList = this.onNewItemInList.bind(this);
   }
   
   login(token) {
@@ -103,6 +104,14 @@ class App extends Component {
     });
   }
   
+  onNewItemInList(item, list) {
+    let l = this.state.lists.find((l) => l.id === list.id);
+    l.items.push(item);
+    this.setState({
+      lists: this.state.lists,
+    });
+  }
+  
   render() {
     return (
       <React.Fragment>
@@ -127,6 +136,7 @@ class App extends Component {
             { this.state.currentList ? 
               <CurrentList
                 currentList={this.state.currentList}
+                onNewItemInList={this.onNewItemInList}
               />
             :
               <React.Fragment></React.Fragment>

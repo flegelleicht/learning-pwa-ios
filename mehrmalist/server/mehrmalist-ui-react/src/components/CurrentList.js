@@ -8,10 +8,27 @@ class CurrentList extends Component {
     }
     
     this.onChangeQuickentry = this.onChangeQuickentry.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
   }
   
   onChangeQuickentry(event) {
     this.setState({quickentryValue: event.target.value});
+  }
+  
+  onKeyUp(event) {
+    switch (event.key) {
+    case 'Enter':
+      let item = {
+        id: `li_${Math.random().toString(36).substr(2)}`,
+        title: this.state.quickentryValue
+      }
+      this.props.onNewItemInList(item, this.props.currentList);
+      this.setState({
+        quickentryValue: ''
+      });
+      break;
+    default: break;
+    }
   }
   
   render () {
@@ -35,7 +52,9 @@ class CurrentList extends Component {
               data-listid={currentList.id}
               placeholder="+ Eintrag" 
               value={this.state.quickentryValue}
-              onChange={this.onChangeQuickentry} />
+              onChange={this.onChangeQuickentry} 
+              onKeyUp={this.onKeyUp}
+              />
           </li>
         </ul>
       </React.Fragment>
