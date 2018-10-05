@@ -68,19 +68,28 @@ class App extends Component {
   startListeningForUpdates() {
     let latestSeenUpdate = this.state.latestSeenUpdate;
     let token = this.state.token;
-    this.updates = new EventSource(`https://localhost:3003/api/v1/updatestream?since=${latestSeenUpdate}&token=${token}`);
-    this.updates.onmessage = (e) => {
-      let update = JSON.parse(e.data);
-      update.fromRemote = true; // Tag update as remote
-      if (update.id > this.state.latestSeenUpdate) { // FIXME!
-        if (this.handleUpdate(update)) {
-          this.setState({latestSeenUpdate: update.id}, ()=>{this.save()});
+    try {
+      this.updates = new EventSource(`https://localhost:3003/api/v1/updatestream?since=${latestSeenUpdate}&token=${token}`);
+      this.updates.onmessage = (e) => {
+        let update = JSON.parse(e.data);
+        update.fromRemote = true; // Tag update as remote
+        if (update.id > this.state.latestSeenUpdate) { // FIXME!
+          if (this.handleUpdate(update)) {
+            this.setState({latestSeenUpdate: update.id}, ()=>{this.save()});
+          }
         }
-      }
-    };
+      };
+    } catch (e) {
+      if(e.name === 'NetworkError'){
+         console.error(`Can’t connect to updates: ${e}. Retrying in 5 seconds`);
+      }      
+      setTimeout(this.startListeningForUpdates, 5000);
+    }
     this.updates.onerror = (e) => {
       this.updates.close();
-      setTimeout(this.startListeningForUpdates, 1000);
+      if (this.state.loggedIn) {
+        setTimeout(this.startListeningForUpdates, 5000);
+      }
     }
   }
   
@@ -112,6 +121,7 @@ class App extends Component {
   
   logout() {
     console.log('logout');
+    this.stopListeningForUpdates();
     this.setState({
       token: ' ',
       loggedIn: false
