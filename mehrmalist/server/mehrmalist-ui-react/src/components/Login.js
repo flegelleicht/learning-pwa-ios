@@ -30,7 +30,11 @@ class Login extends Component {
         });
       }
     })
-    .catch(error => console.error(error));
+    .catch((e) => {
+      if(e.name === 'TypeError' && e.message.match(/NetworkError/)) {
+         console.error(`Can’t connect, server seems to be down: ${e.message}`);
+      }  
+    });
   }
   
   render() {

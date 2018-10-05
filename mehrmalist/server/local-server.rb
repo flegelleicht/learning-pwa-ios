@@ -138,8 +138,18 @@ class Application < Sinatra::Base
     {message: 'Here’s your state'}.to_json
   end
   
+  options '/api/v1/updatestream' do
+    headers "Allow" => "POST, OPTIONS"
+    headers "Access-Control-Allow-Headers"  => "access-control-allow-origin"
+    headers "Access-Control-Allow-Origin"   => "http://localhost:3000"
+    headers "Access-Control-Allow-Methods"  => "POST"
+    halt 200
+  end
+
   # FROM https://gist.github.com/rkh/1476463
   get '/api/v1/updatestream', provides: 'text/event-stream' do
+    headers "Access-Control-Allow-Origin"   => "http://localhost:3000"
+    
     username = request.env[:user]['id'].to_s
     unless (@@connections[username])
       @@connections[username] = []

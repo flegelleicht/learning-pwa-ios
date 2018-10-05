@@ -42,9 +42,15 @@ class App extends Component {
           },
         ],
         currentList: null,
+        latestSeenUpdate: 0,
+        updates: [],
       };
       this.save();
     }
+    this.startListeningForUpdates = this.startListeningForUpdates.bind(this);
+    this.stopListeningForUpdates = this.stopListeningForUpdates.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
+    
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.onNewTemplate = this.onNewTemplate.bind(this);
@@ -59,6 +65,44 @@ class App extends Component {
     this.onChangeItemTitleInList = this.onChangeItemTitleInList.bind(this);
   }
   
+  startListeningForUpdates() {
+    let latestSeenUpdate = this.state.latestSeenUpdate;
+    let token = this.state.token;
+    try {
+      this.updates = new EventSource(`https://localhost:3003/api/v1/updatestream?since=${latestSeenUpdate}&token=${token}`);
+      this.updates.onmessage = (e) => {
+        let update = JSON.parse(e.data);
+        update.fromRemote = true; // Tag update as remote
+        if (update.id > this.state.latestSeenUpdate) { // FIXME!
+          if (this.handleUpdate(update)) {
+            this.setState({latestSeenUpdate: update.id}, ()=>{this.save()});
+          }
+        }
+      };
+    } catch (e) {
+      if(e.name === 'NetworkError'){
+         console.error(`Can’t connect to updates: ${e}. Retrying in 5 seconds`);
+      }      
+      setTimeout(this.startListeningForUpdates, 5000);
+    }
+    this.updates.onerror = (e) => {
+      this.updates.close();
+      if (this.state.loggedIn) {
+        setTimeout(this.startListeningForUpdates, 5000);
+      }
+    }
+  }
+  
+  stopListeningForUpdates() {
+    this.updates.close();
+  }
+
+  handleUpdate(update) {
+    this.state.updates.push(update);
+    this.setState({updates: this.state.updates});
+    return true;
+  }
+  
   save() {
     window.localStorage.setItem('state', JSON.stringify(this.state));
   }
@@ -67,12 +111,17 @@ class App extends Component {
     this.setState({
       token: token,
       loggedIn: true
-    }, ()=>{this.save()});
+    }, 
+    () => {
+      this.startListeningForUpdates();
+      this.save();
+    });
     ;
   }
   
   logout() {
     console.log('logout');
+    this.stopListeningForUpdates();
     this.setState({
       token: ' ',
       loggedIn: false
@@ -136,8 +185,6 @@ class App extends Component {
   }
   
   onChangeItemTitleInList(item, list) {
-    console.log(`onChangeItemTitleInList: ${item.id} ${list.id}`);
-    
     let l = this.state.lists.find((l) => l.id === list.id);
     let i = l.items.find((i) => i.id === item.id);
     i.title = item.title;
