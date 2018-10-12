@@ -1,12 +1,8 @@
 <div id="login-form-container">
   <h1 id="login-form-title">Mehrmalist</h1>
   <form id="login-form" (submit)="login($event)">
-    <input type="text" id="login-user" placeholder="Nutzer" 
-      value={{state.user}} 
-      (keyup)="handleChangeUser($event)"/>
-    <input type="password" id="login-pass" placeholder="Passwort" 
-      value={{this.state.pass}} 
-      (keyup)="handleChangePass($event)"/>
+    <input #loginUser type="text" id="login-user" placeholder="Nutzer" />
+    <input #loginPass type="password" id="login-pass" placeholder="Passwort" />
     <input type="submit" value="Anmelden" />
   </form>
 </div>
