@@ -24,17 +24,26 @@ window.addEventListener('load', () => {
       storage.setItem('state', JSON.stringify(state));
     }
     
+    let online = false;
+    
     const emit = (update) => {
       
       if (update.sync) {
-        // ... and if online
-        fetch(
-          'api/v1/update',
-          Object.assign(
-            { body: JSON.stringify(update) },
-            UPDATEOPTIONS()
-          )
-        ).then(r => console.log(r)).catch(e => console.error(e));
+        if (online) {
+          // ... and if online
+          fetch(
+            'api/v1/update',
+            Object.assign(
+              { body: JSON.stringify(update) },
+              UPDATEOPTIONS()
+            )
+          ).then(r => console.log(r)).catch(e => console.error(e));
+        } else {
+          if (handleUpdate({upd: update})) {
+            save();
+            render();
+          }
+        }
       } else {
         if (handleUpdate({upd: update})) {
           save();
