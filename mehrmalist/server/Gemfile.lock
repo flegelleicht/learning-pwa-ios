@@ -7,7 +7,7 @@ GEM
     json (2.1.0)
     jwt (2.1.0)
     mustermann (1.0.3)
-    rack (2.0.5)
+    rack (2.0.6)
     rack-protection (2.0.4)
       rack
     sequel (5.13.0)
