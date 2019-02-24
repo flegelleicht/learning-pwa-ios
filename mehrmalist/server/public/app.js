@@ -1,4 +1,5 @@
 window.addEventListener('load', () => {
+  const LOCAL_STORAGE_KEY = 'state.mehrmalist';
   const init = () => {
     let storage = window.localStorage;
     let TEMPLATES;
@@ -9,8 +10,8 @@ window.addEventListener('load', () => {
     let UPDATEOPTIONS = () => {return {method: 'POST', headers: {'Authorization': `Bearer ${TOKEN}`}}};
     
     /* Load / setup storage */
-    if (!storage.getItem('state')) {
-      storage.setItem('state', JSON.stringify({
+    if (!storage.getItem(LOCAL_STORAGE_KEY)) {
+      storage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({
         templates: [...DEFAULT_TEMPLATES],
         lists: [],
         currentListId: null,
@@ -21,7 +22,7 @@ window.addEventListener('load', () => {
     }    
     
     const save = () => {
-      storage.setItem('state', JSON.stringify(state));
+      storage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
     }
     
     const emit = (update) => {
@@ -239,7 +240,7 @@ window.addEventListener('load', () => {
       }
     }
     
-    state = JSON.parse(storage.getItem('state'));
+    state = JSON.parse(storage.getItem(LOCAL_STORAGE_KEY));
     if (state) {
       TEMPLATES = state.templates;
       LISTS = state.lists;
@@ -481,7 +482,7 @@ window.addEventListener('load', () => {
               response.json().then(json => {
                 state.authToken = TOKEN = json.token;
                 state.status = 'logged-in';
-                storage.setItem('state', JSON.stringify(state));
+                storage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
                 startUpdates();
                 render();
               });
@@ -645,7 +646,7 @@ window.addEventListener('load', () => {
           state.authToken = '';
           state.status = 'logged-out';
           if (updates) updates.close();
-          storage.setItem('state', JSON.stringify(state));
+          storage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
           render();
         });
       }
@@ -659,7 +660,7 @@ window.addEventListener('load', () => {
           } else {
             template.expanded = true;
           }
-          storage.setItem('state', JSON.stringify(state));
+          storage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
           render();
         });
       });  
