@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  mehrmalist:
+    image: flgl/mehrmalist:0.5.0
+    expose:
+      - "4567"
+    env_file:
+      - jwt.env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:mehrmalist.flgl.io"
+      - "traefik.port=4567"
+    networks:
+      - traefik_default
+networks:
+  traefik_default:
+    external: true
+
