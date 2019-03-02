@@ -25,17 +25,26 @@ window.addEventListener('load', () => {
       storage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
     }
     
+    let online = false;
+    
     const emit = (update) => {
       
       if (update.sync) {
-        // ... and if online
-        fetch(
-          'api/v1/update',
-          Object.assign(
-            { body: JSON.stringify(update) },
-            UPDATEOPTIONS()
-          )
-        ).then(r => console.log(r)).catch(e => console.error(e));
+        if (online) {
+          // ... and if online
+          fetch(
+            'api/v1/update',
+            Object.assign(
+              { body: JSON.stringify(update) },
+              UPDATEOPTIONS()
+            )
+          ).then(r => console.log(r)).catch(e => console.error(e));
+        } else {
+          if (handleUpdate({upd: update})) {
+            save();
+            render();
+          }
+        }
       } else {
         if (handleUpdate({upd: update})) {
           save();
@@ -123,6 +132,16 @@ window.addEventListener('load', () => {
           params: {
             tid: params.tid,
             iid: params.iid
+          }
+        }
+      },
+      makeNewTemplateFromList: (params = {}) => {
+        return {
+          sync: false,
+          action: 'make-new-template-from-list',
+          params: {
+            lid: params.lid,
+            tid: params.tid
           }
         }
       },
@@ -319,6 +338,22 @@ window.addEventListener('load', () => {
           let t = TEMPLATES.find((t) => { return t.id === cmd.params.tid; } );
           let i = t.items.find((i) => { return i.id === cmd.params.iid; } );
           i.editing = false;
+        }
+        return true;
+      case 'make-new-template-from-list':
+        {
+          let l = LISTS.find((l) => { return l.id == cmd.params.lid;  });
+          let t = {
+            id: cmd.params.tid,
+            title: l.title,
+            items: l.items.map((i) => {
+              let r = {};
+              r.title = i.title;
+              r.id = i.id.replace('li_', 'ti_');
+              return r;
+            })
+          }
+          TEMPLATES.push(t);
         }
         return true;
       case 'make-new-list-from-template':
@@ -610,7 +645,9 @@ window.addEventListener('load', () => {
       if (CURRENTLISTID) {
         let l = LISTS.find((l) => { return l.id === CURRENTLISTID; });
         CurrentList += `
-          <h1 id="list-header">Liste: ${l.title}</h1>
+          <h1 id="list-header">Liste: ${l.title}
+            <a href='#' class="make-new-template-from-list" title="Template aus dieser Liste erstellen" data-listid="${l.id}">⇧</a>
+          </h1>
         `;
         
         let todoListItems = l.items.filter(item => !item.done);
@@ -832,6 +869,17 @@ window.addEventListener('load', () => {
         });
       });
       
+      Array.from(document.getElementsByClassName('make-new-template-from-list')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          emit(
+            UPDATES.makeNewTemplateFromList({
+              tid: `t_${Math.random().toString(36).substr(2)}`,
+              lid: event.target.dataset.listid
+            })
+          );
+        })
+      });
             
       /* Make list from template by clicking on it */
       Array.from(document.getElementsByClassName('make-new-list-from-this')).map((el) => {
