@@ -111,7 +111,16 @@ window.addEventListener('load', () => {
             title: params.title
           }
         }
-        
+      },
+      deleteTemplateItem: (params = {}) => {
+        return {
+          sync: true,
+          action: 'delete-template-item',
+          params: {
+            tid: params.tid,
+            iid: params.iid
+          }
+        }
       },
       editTemplateItemTitle: (params = {}) => {
         return {
@@ -350,6 +359,12 @@ window.addEventListener('load', () => {
           };
           t.items.push(item);
           state.focussedInputFieldId = FOCUSSEDINPUTFIELDID = `input-template-item-title-${t.id}-${item.id}`;
+        }
+        return true;
+      case 'delete-template-item':
+        {
+          let t = TEMPLATES.find((t) => { return t.id === cmd.params.tid; } );
+          t.items = t.items.filter((i) => i.id !== cmd.params.iid );
         }
         return true;
       case 'edit-template-item-title':
@@ -612,7 +627,9 @@ window.addEventListener('load', () => {
               <a href='#' class="commit-template-item-title" data-templateid="${template.id}" data-itemid="${item.id}">✓</a>
               <a href='#' class="cancel-template-item-title" data-templateid="${template.id}" data-itemid="${item.id}">𐄂</a>` 
             :
-            `<span class="templateitem" id="${item.id}">${item.title}</span> <a href='#' class="edit-template-item-title" data-templateid=${template.id} data-itemid="${item.id}">✍︎</a>`
+            `<span class="templateitem" id="${item.id}">${item.title}</span>
+             <a href='#' class="edit-template-item-title" data-templateid="${template.id}" data-itemid="${item.id}">✍︎</a>
+             <a href='#' class="delete-template-item" data-templateid="${template.id}" data-itemid="${item.id}">☒</a>`
           }
         </li>`;
       };
@@ -861,6 +878,19 @@ window.addEventListener('load', () => {
         });
       });
       
+      /* Delete an item from a template */
+      Array.from(document.getElementsByClassName('delete-template-item')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          emit(
+            UPDATES.deleteTemplateItem({
+              tid: event.target.dataset.templateid,
+              iid: event.target.dataset.itemid
+            })
+          );
+        });
+      });
+
       /* Edit item title */
       Array.from(document.getElementsByClassName('edit-template-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
@@ -921,8 +951,8 @@ window.addEventListener('load', () => {
                 );
               }
               if (event.shiftKey) {
-                console.log("SHIFT!");
-                document.getElementsByClassName('add-item-to-template')[0].click();
+                // FIXME: this will fail if the page structure changes :(
+                event.target.parentElement.parentElement.getElementsByClassName('add-item-to-template')[0].click();
               } else {
                 render();                
               }
@@ -1132,7 +1162,7 @@ window.addEventListener('load', () => {
           );
         })
       });
-      
+
       /* Edit item title */
       Array.from(document.getElementsByClassName('edit-item-title')).map((el) => {
         el.addEventListener('click', (event) => {
