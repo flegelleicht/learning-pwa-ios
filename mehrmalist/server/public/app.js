@@ -63,6 +63,15 @@ window.addEventListener('load', () => {
             title: params.title,
           }};
       },
+      deleteTemplate: (params = {}) => {
+        return {
+          sync: true,
+          action: 'delete-template',
+          params: {
+            tid: params.id
+          }
+        }
+      },
       editTemplateTitle: (params = {}) => {
         return {
           sync: false,
@@ -304,6 +313,11 @@ window.addEventListener('load', () => {
               id: cmd.params.id, title: cmd.params.title, items: [] };
             TEMPLATES.push(t);
           }
+        }
+        return true;
+      case 'delete-template':
+        {
+          state.templates = TEMPLATES = TEMPLATES.filter((t) => t.id !== cmd.params.tid);
         }
         return true;
       case 'edit-template-title': 
@@ -618,7 +632,8 @@ window.addEventListener('load', () => {
                           ` 
                           :
                           `<span class="template" id="${t.id}">${t.title}</span>
-                          <a href='#' class="edit-template-title" data-templateid="${t.id}">✍︎</a>`
+                          <a href='#' class="edit-template-title" data-templateid="${t.id}">✍︎</a>
+                          <a href='#' class="delete-template" data-templateid="${t.id}">☒</a>`
                         }
 
                         <a href='#' class="make-new-list-from-this" data-templateid="${t.id}">❏</a>
@@ -766,6 +781,14 @@ window.addEventListener('load', () => {
         });
       }
       
+      /* Delete a template */
+      Array.from(document.getElementsByClassName('delete-template')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          emit(UPDATES.deleteTemplate({id: event.target.dataset.templateid}));
+        });
+      });
+
       /* Enable template title editing */
       Array.from(document.getElementsByClassName('edit-template-title')).map((el) => {
         el.addEventListener('click', (event) => {
