@@ -157,6 +157,18 @@ window.addEventListener('load', () => {
         }
       },
 
+      mixTemplateInList: (params = {}) => {
+        return {
+          sync: true,
+          action: 'mix-template-in-list',
+          params: {
+            tid: params.tid,
+            lid: params.lid,
+            pre: params.idprefix
+          }
+        };
+      },
+
       makeNewList: (params = {}) => {
         return {
           sync: true,
@@ -354,6 +366,20 @@ window.addEventListener('load', () => {
             })
           }
           TEMPLATES.push(t);
+        }
+        return true;
+      case 'mix-template-in-list':
+        {
+          let l = LISTS.find((l) => { return l.id == cmd.params.lid; });
+          let t = TEMPLATES.find((t) => { return t.id == cmd.params.tid; })
+          let items = t.items.map((i) => {
+            let r = {};
+            r.title = i.title;
+            id = i.id.replace('ti_', '');
+            r.id = `li_${cmd.params.pre}_${id}`;
+            return r;
+          });
+          l.items = l.items.concat(items);
         }
         return true;
       case 'make-new-list-from-template':
@@ -569,9 +595,11 @@ window.addEventListener('load', () => {
                           ` 
                           :
                           `<span class="template" id="${t.id}">${t.title}</span>
-                          <a href='#' class="edit-template-title" data-templateid="${t.id}">✍︎</a>`}
+                          <a href='#' class="edit-template-title" data-templateid="${t.id}">✍︎</a>`
+                        }
 
                         <a href='#' class="make-new-list-from-this" data-templateid="${t.id}">❏</a>
+                        <a href='#' class="mix-template-in-list" data-templateid="${t.id}">⇣</a>
 
                         ${t.expanded ? `<ul>
                           ${t.items.reduce((acc, item) => {return acc + 
@@ -894,6 +922,19 @@ window.addEventListener('load', () => {
         });
       });
       
+      /* Mix-in the template with the currently active list */
+      Array.from(document.getElementsByClassName('mix-template-in-list')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          emit(
+            UPDATES.mixTemplateInList({
+              tid: event.target.dataset.templateid,
+              lid: CURRENTLISTID,
+              idprefix: `${Math.random().toString(36).substr(2,4)}`,
+            })
+          );
+        });
+      });
       /* Make a new list without a template */
       let makeNewList = document.getElementById('make-new-list');
       if (makeNewList) {
