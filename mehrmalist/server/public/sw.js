@@ -1,4 +1,4 @@
-const VERSION = '0.3.4';
+const VERSION = '0.3.12';
 const CACHE_VERSION = 'v' + VERSION;
 
 let cachedUrls = [
