@@ -178,6 +178,15 @@ window.addEventListener('load', () => {
           }
         };
       },
+      deleteList: (params = {}) => {
+        return {
+          sync: true,
+          action: 'delete-list',
+          params: {
+            lid: params.lid
+          }
+        }
+      },
       editListTitle: (params = {}) => {
         return {
           sync: false,
@@ -408,6 +417,20 @@ window.addEventListener('load', () => {
           };
           LISTS.push(l);
           state.currentListId = CURRENTLISTID = l.id;
+        }
+        return true;
+      case 'delete-list':
+        {
+          let lid = cmd.params.lid;
+          let idx = LISTS.findIndex((l) => l.id === lid);
+          state.lists = LISTS = LISTS.filter((l) => l.id !== cmd.params.lid);
+
+          if (lid === CURRENTLISTID) {
+            idx = Math.max(0, idx-1);
+            let l = LISTS[idx];
+            let id = (l ? l.id : null);
+            state.currentListId = CURRENTLISTID = id;
+          }
         }
         return true;
       case 'edit-list-title':
@@ -641,7 +664,8 @@ window.addEventListener('load', () => {
                             class="list ${CURRENTLISTID === l.id ? `currentList` : ''}" 
                             id="${l.id}"
                           >${l.title}</span>
-                        <a href='#' class="edit-list-title" data-listid="${l.id}">✍︎</a>`
+                        <a href='#' class="edit-list-title" data-listid="${l.id}">✍︎</a>
+                        <a href='#' class="delete-list" data-listid="${l.id}">☒</a>`
                       }
                     </li>`;
         return acc + html
@@ -946,6 +970,16 @@ window.addEventListener('load', () => {
         });
       }
       
+      /* Delete a list */
+      Array.from(document.getElementsByClassName('delete-list')).map((el) => {
+        el.addEventListener('click', (event) => {
+          event.preventDefault(); event.stopPropagation();
+          emit(
+            UPDATES.deleteList({lid: event.target.dataset.listid})
+          );
+        });
+      });
+
       /* Enable item title editing */
       Array.from(document.getElementsByClassName('edit-list-title')).map((el) => {
         el.addEventListener('click', (event) => {
